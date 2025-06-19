@@ -16,6 +16,7 @@ import AdminLayout from './components/admin/AdminLayout';
 import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import UserManagement from './pages/admin/UserManagement';
+import PropertyManagement from './pages/admin/PropertyManagement';
 import UnauthorizedPage from './pages/admin/UnauthorizedPage';
 
 function App() {
@@ -45,7 +46,7 @@ function App() {
             }>
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<UserManagement />} />
-              <Route path="properties" element={<div>Property Management - Coming Soon</div>} />
+              <Route path="properties" element={<PropertyManagement />} />
               <Route path="locations" element={<div>Location Management - Coming Soon</div>} />
               <Route path="reports" element={<div>Reports Management - Coming Soon</div>} />
               <Route path="analytics" element={<div>Analytics - Coming Soon</div>} />
