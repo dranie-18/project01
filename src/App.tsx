@@ -10,6 +10,11 @@ import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 
+// Premium Pages
+import PremiumUpgradePage from './pages/PremiumUpgradePage';
+import PremiumDashboardPage from './pages/PremiumDashboardPage';
+import PremiumFeaturesPage from './pages/PremiumFeaturesPage';
+
 // Admin Components
 import ProtectedRoute from './components/admin/ProtectedRoute';
 import AdminLayout from './components/admin/AdminLayout';
@@ -17,11 +22,13 @@ import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import UserManagement from './pages/admin/UserManagement';
 import PropertyManagement from './pages/admin/PropertyManagement';
+import PremiumManagement from './pages/admin/PremiumManagement';
 import CategoryManagement from './pages/admin/CategoryManagement';
 import LocationManagement from './pages/admin/LocationManagement';
 import ReportsManagement from './pages/admin/ReportsManagement';
 import ModerationHistory from './pages/admin/ModerationHistory';
 import Analytics from './pages/admin/Analytics';
+import Settings from './pages/admin/Settings';
 import UnauthorizedPage from './pages/admin/UnauthorizedPage';
 
 function App() {
@@ -40,6 +47,11 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
 
+            {/* Premium Routes */}
+            <Route path="/premium/upgrade" element={<PremiumUpgradePage />} />
+            <Route path="/premium/features" element={<PremiumFeaturesPage />} />
+            <Route path="/dashboard/premium" element={<PremiumDashboardPage />} />
+
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/admin/unauthorized" element={<UnauthorizedPage />} />
@@ -52,12 +64,13 @@ function App() {
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<UserManagement />} />
               <Route path="properties" element={<PropertyManagement />} />
+              <Route path="premium" element={<PremiumManagement />} />
               <Route path="categories" element={<CategoryManagement />} />
               <Route path="locations" element={<LocationManagement />} />
               <Route path="reports" element={<ReportsManagement />} />
               <Route path="moderation-history" element={<ModerationHistory />} />
               <Route path="analytics" element={<Analytics />} />
-              <Route path="settings" element={<div>Settings - Coming Soon</div>} />
+              <Route path="settings" element={<Settings />} />
             </Route>
           </Routes>
         </Router>
