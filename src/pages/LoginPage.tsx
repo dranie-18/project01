@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
-import { Eye, EyeOff, AlertCircle, RefreshCw, Wifi, WifiOff } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -10,17 +10,8 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [isRetrying, setIsRetrying] = useState(false);
   
-  const { 
-    signIn, 
-    isAuthenticated, 
-    loading, 
-    error, 
-    clearError, 
-    serviceStatus,
-    retryConnection 
-  } = useAuth();
+  const { signIn, isAuthenticated, loading, error, clearError } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -47,50 +38,6 @@ const LoginPage: React.FC = () => {
       console.error('Login failed:', error);
     }
   };
-
-  const handleRetry = async () => {
-    setIsRetrying(true);
-    try {
-      await retryConnection();
-    } catch (error) {
-      console.error('Retry failed:', error);
-    } finally {
-      setIsRetrying(false);
-    }
-  };
-
-  const getServiceStatusIcon = () => {
-    switch (serviceStatus) {
-      case 'healthy':
-        return <Wifi className="text-success-600" size={16} />;
-      case 'degraded':
-        return <Wifi className="text-warning-600" size={16} />;
-      case 'down':
-        return <WifiOff className="text-error-600" size={16} />;
-      default:
-        return <Wifi className="text-neutral-400" size={16} />;
-    }
-  };
-
-  const getServiceStatusText = () => {
-    switch (serviceStatus) {
-      case 'healthy':
-        return 'Layanan Normal';
-      case 'degraded':
-        return 'Layanan Terbatas';
-      case 'down':
-        return 'Layanan Bermasalah';
-      default:
-        return 'Memeriksa Status...';
-    }
-  };
-
-  const isServerError = error && (
-    error.includes('server') || 
-    error.includes('gangguan') || 
-    error.includes('Database error') ||
-    serviceStatus === 'down'
-  );
   
   return (
     <Layout>
@@ -107,52 +54,13 @@ const LoginPage: React.FC = () => {
               <h1 className="font-heading font-bold text-2xl text-accent mb-6 text-center">
                 Masuk ke <span className="text-primary">Properti Pro</span>
               </h1>
-
-              {/* Service Status Indicator */}
-              <div className="mb-4 flex items-center justify-center space-x-2 text-sm">
-                {getServiceStatusIcon()}
-                <span className={`
-                  ${serviceStatus === 'healthy' ? 'text-success-600' : ''}
-                  ${serviceStatus === 'degraded' ? 'text-warning-600' : ''}
-                  ${serviceStatus === 'down' ? 'text-error-600' : ''}
-                  ${serviceStatus === 'healthy' ? '' : 'text-neutral-600'}
-                `}>
-                  {getServiceStatusText()}
-                </span>
-              </div>
               
               {error && (
-                <div className="bg-error-50 border border-error-200 text-error-700 p-3 rounded-md mb-4">
-                  <div className="flex items-start">
-                    <AlertCircle size={18} className="mr-2 mt-0.5 flex-shrink-0" />
-                    <div className="flex-1">
-                      <p className="font-medium">Login gagal</p>
-                      <p className="text-sm">{error}</p>
-                      
-                      {isServerError && (
-                        <div className="mt-3 pt-2 border-t border-error-200">
-                          <p className="text-xs text-error-600 mb-2">
-                            Kemungkinan penyebab:
-                          </p>
-                          <ul className="text-xs text-error-600 space-y-1 list-disc list-inside">
-                            <li>Server sedang dalam pemeliharaan</li>
-                            <li>Gangguan jaringan sementara</li>
-                            <li>Beban server tinggi</li>
-                          </ul>
-                          <button
-                            onClick={handleRetry}
-                            disabled={isRetrying || loading}
-                            className="mt-2 inline-flex items-center text-xs text-error-700 hover:text-error-800 disabled:opacity-50"
-                          >
-                            <RefreshCw 
-                              size={12} 
-                              className={`mr-1 ${isRetrying ? 'animate-spin' : ''}`} 
-                            />
-                            {isRetrying ? 'Mencoba ulang...' : 'Coba lagi'}
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                <div className="bg-error-50 border border-error-200 text-error-700 p-3 rounded-md mb-4 flex items-start">
+                  <AlertCircle size={18} className="mr-2 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium">Login gagal</p>
+                    <p className="text-sm">{error}</p>
                   </div>
                 </div>
               )}
@@ -170,7 +78,7 @@ const LoginPage: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    disabled={loading || isRetrying}
+                    disabled={loading}
                   />
                 </div>
                 
@@ -187,14 +95,13 @@ const LoginPage: React.FC = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      disabled={loading || isRetrying}
+                      disabled={loading}
                     />
                     <button
                       type="button"
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-500"
                       onClick={() => setShowPassword(!showPassword)}
                       tabIndex={-1}
-                      disabled={loading || isRetrying}
                     >
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
@@ -209,7 +116,7 @@ const LoginPage: React.FC = () => {
                       className="h-4 w-4 text-primary border-neutral-300 rounded focus:ring-primary"
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
-                      disabled={loading || isRetrying}
+                      disabled={loading}
                     />
                     <label htmlFor="remember" className="ml-2 block text-sm text-neutral-700">
                       Ingat saya
@@ -223,12 +130,9 @@ const LoginPage: React.FC = () => {
                 <button
                   type="submit"
                   className="w-full btn-primary py-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={loading || isRetrying || serviceStatus === 'down'}
+                  disabled={loading}
                 >
-                  {loading ? 'Memproses...' : 
-                   isRetrying ? 'Mencoba ulang...' : 
-                   serviceStatus === 'down' ? 'Layanan Tidak Tersedia' : 
-                   'Masuk'}
+                  {loading ? 'Memproses...' : 'Masuk'}
                 </button>
               </form>
               
@@ -251,21 +155,6 @@ const LoginPage: React.FC = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Service Status Help */}
-              {serviceStatus !== 'healthy' && (
-                <div className="mt-4 pt-4 border-t border-neutral-200">
-                  <div className="bg-neutral-50 p-3 rounded-lg">
-                    <p className="text-xs text-neutral-600 mb-2">Bantuan:</p>
-                    <div className="text-xs text-neutral-700 space-y-1">
-                      <p>• Periksa koneksi internet Anda</p>
-                      <p>• Coba refresh halaman (F5)</p>
-                      <p>• Tunggu beberapa menit dan coba lagi</p>
-                      <p>• Hubungi administrator jika masalah berlanjut</p>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
