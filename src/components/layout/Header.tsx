@@ -48,17 +48,24 @@ const Header: React.FC = () => {
             <Link to="/agen" className="font-medium hover:text-primary transition-colors">
               Agen
             </Link>
+            <Link to="/premium/features" className="font-medium hover:text-primary transition-colors">
+              Premium
+            </Link>
           </nav>
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated ? (
               <>
-                <Link to="/favorit" className="text-neutral-700 hover:text-primary transition-colors">
+                <Link to="/favorit" className="text-neutral-700 hover:text-primary transition-colors" aria-label="Saved properties">
                   <Heart size={20} />
                 </Link>
                 <div className="relative group">
-                  <button className="flex items-center space-x-2 text-neutral-700 hover:text-primary transition-colors">
+                  <button 
+                    className="flex items-center space-x-2 text-neutral-700 hover:text-primary transition-colors"
+                    aria-haspopup="true"
+                    aria-expanded={false}
+                  >
                     {user?.avatar_url ? (
                       <img 
                         src={user.avatar_url} 
@@ -74,16 +81,22 @@ const Header: React.FC = () => {
                   {/* Dropdown Menu */}
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-neutral-200 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                     <Link 
-                      to="/profil" 
+                      to="/user/profile" 
                       className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
                     >
                       Profil Saya
                     </Link>
                     <Link 
-                      to="/properti-saya" 
+                      to="/user/properties" 
                       className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
                     >
                       Properti Saya
+                    </Link>
+                    <Link 
+                      to="/user/dashboard" 
+                      className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
+                    >
+                      Dashboard
                     </Link>
                     {user?.role === 'admin' || user?.role === 'superadmin' ? (
                       <Link 
@@ -116,7 +129,13 @@ const Header: React.FC = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <button className="md:hidden" onClick={toggleMenu}>
+          <button 
+            className="md:hidden" 
+            onClick={toggleMenu}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-menu"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -124,7 +143,7 @@ const Header: React.FC = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white border-t py-4">
+        <div id="mobile-menu" className="md:hidden bg-white border-t py-4">
           <div className="container mx-auto px-4 flex flex-col space-y-4">
             <Link to="/" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
               <Home size={20} />
@@ -139,6 +158,9 @@ const Header: React.FC = () => {
             <Link to="/agen" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
               <span>Agen</span>
             </Link>
+            <Link to="/premium/features" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
+              <span>Premium</span>
+            </Link>
             
             <hr className="border-neutral-200" />
             
@@ -148,9 +170,15 @@ const Header: React.FC = () => {
                   <Heart size={20} />
                   <span>Favorit</span>
                 </Link>
-                <Link to="/profil" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
+                <Link to="/user/profile" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
                   <User size={20} />
                   <span>Profil ({user?.full_name})</span>
+                </Link>
+                <Link to="/user/dashboard" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
+                  <span>Dashboard</span>
+                </Link>
+                <Link to="/user/properties" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
+                  <span>Properti Saya</span>
                 </Link>
                 {user?.role === 'admin' || user?.role === 'superadmin' ? (
                   <Link to="/admin/dashboard" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
