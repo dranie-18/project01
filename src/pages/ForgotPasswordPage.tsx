@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
-import { Mail, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
+import { authMessages } from '../utils/authMessages';
 
 const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
-  const { resetPassword, error, clearError } = useAuth();
+  const { resetPassword, clearError } = useAuth();
+  const { showError, showSuccess, showInfo } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,6 +23,10 @@ const ForgotPasswordPage: React.FC = () => {
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
+      showError(
+        authMessages.register.invalidEmail.title,
+        authMessages.register.invalidEmail.message
+      );
       setIsLoading(false);
       return;
     }
@@ -27,9 +34,19 @@ const ForgotPasswordPage: React.FC = () => {
     try {
       await resetPassword(email);
       setIsSubmitted(true);
-    } catch (error) {
-      // Error is handled by context
-      console.error('Password reset failed:', error);
+      showSuccess(
+        authMessages.passwordReset.emailSent.title,
+        authMessages.passwordReset.emailSent.message
+      );
+    } catch (error: any) {
+      if (error.message.includes('user not found')) {
+        showError(
+          authMessages.passwordReset.emailNotFound.title,
+          authMessages.passwordReset.emailNotFound.message
+        );
+      } else {
+        showError('Reset Failed', error.message || 'Failed to send reset link. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -39,8 +56,15 @@ const ForgotPasswordPage: React.FC = () => {
     setIsLoading(true);
     try {
       await resetPassword(email);
-    } catch (error) {
-      console.error('Resend failed:', error);
+      showSuccess(
+        'Reset Link Sent Again',
+        'We\'ve sent another password reset link to your email address.'
+      );
+    } catch (error: any) {
+      showError(
+        'Failed to Resend',
+        error.message || 'Failed to resend reset link. Please try again.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -89,6 +113,7 @@ const ForgotPasswordPage: React.FC = () => {
                     onClick={handleResendEmail}
                     disabled={isLoading}
                     className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label="Resend email"
                   >
                     {isLoading ? 'Mengirim...' : 'Kirim Ulang Email'}
                   </button>
@@ -106,11 +131,16 @@ const ForgotPasswordPage: React.FC = () => {
                   <p className="text-sm text-neutral-500">
                     Tidak menerima email?{' '}
                     <button
-                      onClick={handleResendEmail}
+                      onClick={() => {
+                        showInfo(
+                          'Check Your Spam Folder',
+                          'The reset link email might be in your spam or junk folder. If you still can\'t find it, click "Resend Email".'
+                        );
+                      }}
                       className="text-primary hover:underline"
-                      disabled={isLoading}
+                      aria-label="Check spam folder instructions"
                     >
-                      Kirim ulang
+                      Periksa folder spam
                     </button>
                   </p>
                 </div>
@@ -148,16 +178,6 @@ const ForgotPasswordPage: React.FC = () => {
                 </p>
               </div>
               
-              {error && (
-                <div className="bg-error-50 border border-error-200 text-error-700 p-3 rounded-md mb-4 flex items-start">
-                  <AlertCircle size={18} className="mr-2 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="font-medium">Gagal mengirim email</p>
-                    <p className="text-sm">{error}</p>
-                  </div>
-                </div>
-              )}
-              
               <form onSubmit={handleSubmit}>
                 <div className="mb-6">
                   <label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-1">
@@ -174,6 +194,7 @@ const ForgotPasswordPage: React.FC = () => {
                       onChange={(e) => setEmail(e.target.value)}
                       required
                       disabled={isLoading}
+                      aria-describedby="email-error"
                     />
                   </div>
                 </div>

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
-import { Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
+import { authMessages } from '../utils/authMessages';
 
 const RegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -17,9 +19,9 @@ const RegisterPage: React.FC = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<string[]>([]);
   
   const { signUp, isAuthenticated, loading, error, clearError } = useAuth();
+  const { showError, showSuccess } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,6 +33,21 @@ const RegisterPage: React.FC = () => {
   useEffect(() => {
     clearError();
   }, [clearError]);
+
+  useEffect(() => {
+    if (error) {
+      // Handle specific error messages
+      if (error.includes('already registered')) {
+        showError(
+          authMessages.register.emailExists.title,
+          authMessages.register.emailExists.message
+        );
+      } else {
+        // Generic error
+        showError('Registration Failed', error);
+      }
+    }
+  }, [error, showError]);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -40,42 +57,67 @@ const RegisterPage: React.FC = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-
-    // Clear validation errors when user starts typing
-    if (validationErrors.length > 0) {
-      setValidationErrors([]);
-    }
   };
 
   const validateForm = (): boolean => {
-    const errors: string[] = [];
-
+    // Check full name
     if (!formData.fullName.trim()) {
-      errors.push('Nama lengkap harus diisi');
+      showError(
+        authMessages.register.nameRequired.title,
+        authMessages.register.nameRequired.message
+      );
+      return false;
     }
 
+    // Check email
     if (!formData.email.trim()) {
-      errors.push('Email harus diisi');
+      showError(
+        authMessages.register.emailRequired.title,
+        authMessages.register.emailRequired.message
+      );
+      return false;
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.push('Format email tidak valid');
+      showError(
+        authMessages.register.invalidEmail.title,
+        authMessages.register.invalidEmail.message
+      );
+      return false;
     }
 
+    // Check password
     if (!formData.password) {
-      errors.push('Password harus diisi');
+      showError(
+        authMessages.register.passwordRequired.title,
+        authMessages.register.passwordRequired.message
+      );
+      return false;
     } else if (formData.password.length < 8) {
-      errors.push('Password minimal 8 karakter');
+      showError(
+        authMessages.register.passwordTooShort.title,
+        authMessages.register.passwordTooShort.message
+      );
+      return false;
     }
 
+    // Check password confirmation
     if (formData.password !== formData.confirmPassword) {
-      errors.push('Password dan konfirmasi password tidak cocok');
+      showError(
+        authMessages.register.passwordMismatch.title,
+        authMessages.register.passwordMismatch.message
+      );
+      return false;
     }
 
+    // Check terms agreement
     if (!formData.agreeTerms) {
-      errors.push('Anda harus menyetujui syarat dan ketentuan');
+      showError(
+        authMessages.register.termsRequired.title,
+        authMessages.register.termsRequired.message
+      );
+      return false;
     }
 
-    setValidationErrors(errors);
-    return errors.length === 0;
+    return true;
   };
   
   const handleRegister = async (e: React.FormEvent) => {
@@ -92,10 +134,17 @@ const RegisterPage: React.FC = () => {
         role: formData.role,
       });
 
-      // Show success message or redirect
-      // Navigation will be handled by the useEffect above if auto-confirmed
+      showSuccess(
+        authMessages.register.success.title,
+        authMessages.register.success.message
+      );
+      
+      // Navigate to login page after successful registration
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     } catch (error) {
-      // Error is handled by the context
+      // Error is handled by the useEffect above
       console.error('Registration failed:', error);
     }
   };
@@ -116,23 +165,6 @@ const RegisterPage: React.FC = () => {
                 Daftar di <span className="text-primary">Properti Pro</span>
               </h1>
               
-              {(error || validationErrors.length > 0) && (
-                <div className="bg-error-50 border border-error-200 text-error-700 p-3 rounded-md mb-4">
-                  <div className="flex items-start">
-                    <AlertCircle size={18} className="mr-2 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="font-medium">Terjadi kesalahan:</p>
-                      <ul className="text-sm mt-1 space-y-1">
-                        {error && <li>• {error}</li>}
-                        {validationErrors.map((err, index) => (
-                          <li key={index}>• {err}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              )}
-              
               <form onSubmit={handleRegister}>
                 <div className="mb-4">
                   <label htmlFor="fullName" className="block text-sm font-medium text-neutral-700 mb-1">
@@ -148,6 +180,7 @@ const RegisterPage: React.FC = () => {
                     onChange={handleChange}
                     required
                     disabled={loading}
+                    aria-describedby="fullName-error"
                   />
                 </div>
                 
@@ -165,6 +198,7 @@ const RegisterPage: React.FC = () => {
                     onChange={handleChange}
                     required
                     disabled={loading}
+                    aria-describedby="email-error"
                   />
                 </div>
                 
@@ -217,17 +251,19 @@ const RegisterPage: React.FC = () => {
                       required
                       minLength={8}
                       disabled={loading}
+                      aria-describedby="password-requirements"
                     />
                     <button
                       type="button"
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-500"
                       onClick={() => setShowPassword(!showPassword)}
                       tabIndex={-1}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
-                  <p className="text-xs text-neutral-500 mt-1">
+                  <p id="password-requirements" className="text-xs text-neutral-500 mt-1">
                     Password minimal 8 karakter
                   </p>
                 </div>
@@ -247,12 +283,14 @@ const RegisterPage: React.FC = () => {
                       onChange={handleChange}
                       required
                       disabled={loading}
+                      aria-describedby="confirm-password-error"
                     />
                     <button
                       type="button"
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-500"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       tabIndex={-1}
+                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                     >
                       {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>

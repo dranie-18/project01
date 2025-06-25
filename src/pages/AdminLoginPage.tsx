@@ -63,7 +63,10 @@ const AdminLoginPage: React.FC = () => {
     try {
       await signIn(email, password);
       // Navigation will be handled by the useEffect above
-      showSuccess('Login Successful', 'Welcome to the admin panel.');
+      showSuccess(
+        authMessages.login.adminSuccess.title,
+        authMessages.login.adminSuccess.message
+      );
     } catch (error) {
       // Error is handled by context
       console.error('Admin login failed:', error);
