@@ -46,7 +46,7 @@ const HeroSection: React.FC = () => {
       const { count: usersCount } = await supabase
         .from('user_profiles')
         .select('*', { count: 'exact', head: true })
-        .eq('status', 'active');
+        .eq('status', 'active')
       
       setStats({
         totalProperties: propertiesCount || 0,
