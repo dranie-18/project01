@@ -54,7 +54,6 @@ const HeroSection: React.FC = () => {
         totalPropertiesForRent: propertiesforrentCount || 0,
         totalUsers: usersCount || 0
       });
-      console.error('chek:', usersCount);
     } catch (error) {
       console.error('Error fetching stats:', error);
       // Use fallback values if there's an error
