@@ -57,15 +57,11 @@ const Header: React.FC = () => {
           <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated ? (
               <>
-                <Link to="/favorit" className="text-neutral-700 hover:text-primary transition-colors" aria-label="Saved properties">
+                <Link to="/favorit" className="text-neutral-700 hover:text-primary transition-colors">
                   <Heart size={20} />
                 </Link>
                 <div className="relative group">
-                  <button 
-                    className="flex items-center space-x-2 text-neutral-700 hover:text-primary transition-colors"
-                    aria-haspopup="true"
-                    aria-expanded={false}
-                  >
+                  <button className="flex items-center space-x-2 text-neutral-700 hover:text-primary transition-colors">
                     {user?.avatar_url ? (
                       <img 
                         src={user.avatar_url} 
@@ -129,13 +125,7 @@ const Header: React.FC = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden" 
-            onClick={toggleMenu}
-            aria-expanded={isMenuOpen}
-            aria-controls="mobile-menu"
-            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-          >
+          <button className="md:hidden" onClick={toggleMenu}>
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -143,7 +133,7 @@ const Header: React.FC = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div id="mobile-menu" className="md:hidden bg-white border-t py-4">
+        <div className="md:hidden bg-white border-t py-4">
           <div className="container mx-auto px-4 flex flex-col space-y-4">
             <Link to="/" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
               <Home size={20} />
