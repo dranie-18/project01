@@ -4,16 +4,16 @@ import { supabase } from '../../lib/supabase';
 
 interface Stats {
   totalProperties: number;
-  totalProvinces: number;
-  totalAgents: number;
+  totalPropertiesForSale: number;
+  totalPropertiesForRent: number;
   totalUsers: number;
 }
 
 const HeroSection: React.FC = () => {
   const [stats, setStats] = useState<Stats>({
     totalProperties: 0,
-    totalProvinces: 0,
-    totalAgents: 0,
+    totalPropertiesForSale: 0,
+    totalPropertiesForRent: 0,
     totalUsers: 0
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -30,17 +30,17 @@ const HeroSection: React.FC = () => {
         .from('listings')
         .select('*', { count: 'exact', head: true });
       
-      // Get total provinces count
-      const { count: provincesCount } = await supabase
-        .from('locations')
+      // Get total properties for sale count
+      const { count: propertiesforsaleCount } = await supabase
+        .from('listings')
         .select('*', { count: 'exact', head: true })
-        .eq('type', 'provinsi');
+        .eq('purpose', 'jual');
       
-      // Get total agents count
-      const { count: agentsCount } = await supabase
-        .from('user_profiles')
+      // Get total properties for rent count
+      const { count: propertiesforrentCount } = await supabase
+        .from('listings')
         .select('*', { count: 'exact', head: true })
-        .eq('role', 'agent');
+        .eq('purpose', 'sewa');
       
       // Get total users count
       const { count: usersCount } = await supabase
@@ -49,8 +49,8 @@ const HeroSection: React.FC = () => {
       
       setStats({
         totalProperties: propertiesCount || 0,
-        totalProvinces: provincesCount || 0,
-        totalAgents: agentsCount || 0,
+        totalPropertiesForSale: propertiesforsaleCount || 0,
+        totalPropertiesForRent: propertiesforrentCount || 0,
         totalUsers: usersCount || 0
       });
     } catch (error) {
@@ -58,8 +58,8 @@ const HeroSection: React.FC = () => {
       // Use fallback values if there's an error
       setStats({
         totalProperties: 10000,
-        totalProvinces: 34,
-        totalAgents: 500,
+        totalPropertiesForSale: 0,
+        totalPropertiesForRent: 0,
         totalUsers: 15000
       });
     } finally {
@@ -106,13 +106,13 @@ const HeroSection: React.FC = () => {
             </div>
             <div className="text-center">
               <p className="font-heading font-bold text-2xl text-primary">
-                {isLoading ? '...' : stats.totalProvinces}
+                {isLoading ? '...' : stats.totalPropertiesForSale.toLocaleString()}+
               </p>
               <p className="text-neutral-600 text-sm">Properti Dijual</p>
             </div>
             <div className="text-center">
               <p className="font-heading font-bold text-2xl text-primary">
-                {isLoading ? '...' : stats.totalAgents.toLocaleString()}+
+                {isLoading ? '...' : stats.totalPropertiesForRent.toLocaleString()}+
               </p>
               <p className="text-neutral-600 text-sm">Properti Disewa</p>
             </div>
