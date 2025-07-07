@@ -108,19 +108,19 @@ const HeroSection: React.FC = () => {
               <p className="font-heading font-bold text-2xl text-primary">
                 {isLoading ? '...' : stats.totalProvinces}
               </p>
-              <p className="text-neutral-600 text-sm">Provinsi</p>
+              <p className="text-neutral-600 text-sm">Properti Dijual</p>
             </div>
             <div className="text-center">
               <p className="font-heading font-bold text-2xl text-primary">
                 {isLoading ? '...' : stats.totalAgents.toLocaleString()}+
               </p>
-              <p className="text-neutral-600 text-sm">Agen Terpercaya</p>
+              <p className="text-neutral-600 text-sm">Properti Disewa</p>
             </div>
             <div className="text-center">
               <p className="font-heading font-bold text-2xl text-primary">
                 {isLoading ? '...' : stats.totalUsers.toLocaleString()}+
               </p>
-              <p className="text-neutral-600 text-sm">Klien Puas</p>
+              <p className="text-neutral-600 text-sm">Jumlah User</p>
             </div>
           </div>
         </div>
