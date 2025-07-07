@@ -46,6 +46,7 @@ const HeroSection: React.FC = () => {
       const { count: usersCount } = await supabase
         .from('user_profiles')
         .select('*', { count: 'exact', head: true })
+        .in('role', ['user', 'agent'])
         .eq('status', 'active');
       
       setStats({
