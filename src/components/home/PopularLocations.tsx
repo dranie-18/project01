@@ -64,26 +64,28 @@ const PopularLocations: React.FC = () => {
   const fetchPopularLocations = async () => {
     setIsLoading(true);
     try {
-      // Get popular locations from database
-      const popularLocations = await locationService.getAllLocations({
-        isActive: true
-      });
-      
-      // Sort by property count and take top locations
-      const sortedLocations = popularLocations
-        .sort((a, b) => (b.propertyCount || 0) - (a.propertyCount || 0))
-        .slice(0, 6);
-      
+      // Get popular locations from database, ordered by property_count and limited to 10
+      const popularLocations = await locationService.getAllLocations(
+        { isActive: true },
+        { column: 'property_count', ascending: false }, // MODIFIED LINE
+        10 // MODIFIED LINE
+      );
+
+      // Remove client-side sorting and slicing as it's handled by the service now
+      // const sortedLocations = popularLocations
+      //   .sort((a, b) => (b.propertyCount || 0) - (a.propertyCount || 0))
+      //   .slice(0, 6);
+
       // Get parent locations for cities/districts
-      const locationWithParents = await Promise.all(sortedLocations.map(async (location) => {
+      const locationWithParents = await Promise.all(popularLocations.map(async (location) => { // MODIFIED LINE
         let provinceName = '';
-        
+
         if (location.type !== 'provinsi' && location.parentId) {
           // For cities, get the province directly
           if (location.type === 'kota') {
             const province = popularLocations.find(p => p.id === location.parentId);
             provinceName = province?.name || '';
-          } 
+          }
           // For districts, get the city first, then the province
           else if (location.type === 'kecamatan') {
             const city = popularLocations.find(c => c.id === location.parentId);
@@ -95,10 +97,10 @@ const PopularLocations: React.FC = () => {
         } else if (location.type === 'provinsi') {
           provinceName = 'Indonesia';
         }
-        
+
         // Map location images (in a real app, these would be stored in the database)
         const locationImages: {[key: string]: string} = {
-          'jakarta-selatan': 'LocationGalleryCard',
+          'jakarta-selatan': 'https://images.pexels.com/photos/2437856/pexels-photo-2437856.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750', // MODIFIED LINE
           'bandung': 'https://images.pexels.com/photos/2486168/pexels-photo-2486168.jpeg',
           'surabaya': 'https://images.pexels.com/photos/1538177/pexels-photo-1538177.jpeg',
           'bali': 'https://images.pexels.com/photos/4112236/pexels-photo-4112236.jpeg',
@@ -108,16 +110,17 @@ const PopularLocations: React.FC = () => {
           'makassar': 'https://images.pexels.com/photos/2111766/pexels-photo-2111766.jpeg',
           'default': 'https://images.pexels.com/photos/1732414/pexels-photo-1732414.jpeg'
         };
-        
+
         return {
           name: location.name,
           province: provinceName,
           image: locationImages[location.slug] || locationImages.default,
           propertyCount: location.propertyCount || 0,
-          slug: location.slug
+          slug: location.slug,
+          averageRating: 4.5 // NEW CODE: Placeholder for average rating
         };
       }));
-      
+
       setLocations(locationWithParents);
     } catch (error) {
       console.error('Error fetching popular locations:', error);
