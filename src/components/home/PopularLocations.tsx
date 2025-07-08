@@ -6,10 +6,10 @@ import { locationService } from '../../services/locationService';
 interface LocationCardProps {
   name: string;
   province: string;
-  image: string;
+  image: string; // This will now be the resolved image URL (from DB or fallback)
   propertyCount: number;
   slug: string;
-  averageRating?: number; // MODIFIED LINE
+  averageRating?: number;
 }
 
 const LocationCard: React.FC<LocationCardProps> = ({
@@ -18,7 +18,7 @@ const LocationCard: React.FC<LocationCardProps> = ({
   image,
   propertyCount,
   slug,
-  averageRating // MODIFIED LINE
+  averageRating
 }) => {
   return (
     <Link
@@ -40,9 +40,7 @@ const LocationCard: React.FC<LocationCardProps> = ({
           <div>
             <p className="text-neutral-200 text-sm">{province}</p>
             <p className="text-white text-sm">{propertyCount.toLocaleString()} properti</p>
-            {/* NEW CODE: Display average rating placeholder */}
             <p className="text-neutral-200 text-sm">Rating: {averageRating ? `${averageRating.toFixed(1)}/5` : 'N/A'}</p>
-            {/* END NEW CODE */}
           </div>
           <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform group-hover:translate-x-0 translate-x-4">
             <ArrowRight className="text-primary" size={20} />
@@ -64,29 +62,20 @@ const PopularLocations: React.FC = () => {
   const fetchPopularLocations = async () => {
     setIsLoading(true);
     try {
-      // Get popular locations from database, ordered by property_count and limited to 10
       const popularLocations = await locationService.getAllLocations(
         { isActive: true },
-        { column: 'property_count', ascending: false }, // MODIFIED LINE
-        10 // MODIFIED LINE
+        { column: 'property_count', ascending: false },
+        10
       );
 
-      // Remove client-side sorting and slicing as it's handled by the service now
-      // const sortedLocations = popularLocations
-      //   .sort((a, b) => (b.propertyCount || 0) - (a.propertyCount || 0))
-      //   .slice(0, 6);
-
-      // Get parent locations for cities/districts
-      const locationWithParents = await Promise.all(popularLocations.map(async (location) => { // MODIFIED LINE
+      const locationWithParents = await Promise.all(popularLocations.map(async (location) => {
         let provinceName = '';
 
         if (location.type !== 'provinsi' && location.parentId) {
-          // For cities, get the province directly
           if (location.type === 'kota') {
             const province = popularLocations.find(p => p.id === location.parentId);
             provinceName = province?.name || '';
           }
-          // For districts, get the city first, then the province
           else if (location.type === 'kecamatan') {
             const city = popularLocations.find(c => c.id === location.parentId);
             if (city && city.parentId) {
@@ -98,33 +87,23 @@ const PopularLocations: React.FC = () => {
           provinceName = 'Indonesia';
         }
 
-        // Map location images (in a real app, these would be stored in the database)
-        const locationImages: {[key: string]: string} = {
-          'jakarta-selatan': 'https://images.pexels.com/photos/2437856/pexels-photo-2437856.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750', // MODIFIED LINE
-          'bandung': 'https://images.pexels.com/photos/2486168/pexels-photo-2486168.jpeg',
-          'surabaya': 'https://images.pexels.com/photos/1538177/pexels-photo-1538177.jpeg',
-          'bali': 'https://images.pexels.com/photos/4112236/pexels-photo-4112236.jpeg',
-          'yogyakarta': 'https://images.pexels.com/photos/2161467/pexels-photo-2161467.jpeg',
-          'semarang': 'https://images.pexels.com/photos/3254729/pexels-photo-3254729.jpeg',
-          'medan': 'https://images.pexels.com/photos/2846217/pexels-photo-2846217.jpeg',
-          'makassar': 'https://images.pexels.com/photos/2111766/pexels-photo-2111766.jpeg',
-          'default': 'https://images.pexels.com/photos/1732414/pexels-photo-1732414.jpeg'
-        };
+        // Fallback image if image_url is not available from the database
+        const defaultImage = 'https://images.pexels.com/photos/1732414/pexels-photo-1732414.jpeg';
+        const imageUrl = location.image_url || defaultImage; // MODIFIED LINE
 
         return {
           name: location.name,
           province: provinceName,
-          image: locationImages[location.slug] || locationImages.default,
-          propertyCount: location.propertyCount || 0,
+          image: imageUrl, // MODIFIED LINE
+          propertyCount: location.property_count || 0, // MODIFIED LINE
           slug: location.slug,
-          averageRating: 4.5 // NEW CODE: Placeholder for average rating
+          averageRating: 4.5
         };
       }));
 
       setLocations(locationWithParents);
     } catch (error) {
       console.error('Error fetching popular locations:', error);
-      // Fallback to empty array
       setLocations([]);
     } finally {
       setIsLoading(false);
