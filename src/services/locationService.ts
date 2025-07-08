@@ -109,7 +109,7 @@ class LocationService {
         .eq('is_active', true)
         .ilike('name', `%${query}%`)
         .order('name')
-        .limit(10);
+        .limit(9);
 
       if (type) {
         queryBuilder = queryBuilder.eq('type', type);
