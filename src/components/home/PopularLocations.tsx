@@ -2,19 +2,54 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { locationService } from '../../services/locationService';
-import { locationImagesData, LocationImageData } from '../../data/locationImages'; // Import new data
-import LocationGalleryCard from './LocationGalleryCard'; // Import new component
 
-interface LocationCardProps { // This interface is no longer directly used for rendering, but for data mapping
+interface LocationCardProps {
   name: string;
   province: string;
-  image: string; // This will become an array of images in the new structure
+  image: string;
   propertyCount: number;
   slug: string;
 }
 
+const LocationCard: React.FC<LocationCardProps> = ({ 
+  name, 
+  province, 
+  image, 
+  propertyCount, 
+  slug 
+}) => {
+  return (
+    <Link
+      to={`/lokasi/${slug}`}
+      className="relative overflow-hidden rounded-2xl group h-full"
+      aria-label={`Lihat properti di ${name}, ${province}`}
+    >
+      <img 
+        src={image} 
+        alt={`Properti di ${name}`} 
+        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+        loading="lazy"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent group-hover:from-black/90 group-hover:via-black/60 transition-all duration-300 flex flex-col justify-end p-5">
+        <h3 className="font-heading text-white font-semibold text-xl mb-1 transform group-hover:translate-y-0 transition-transform duration-300">
+          {name}
+        </h3>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-neutral-200 text-sm">{province}</p>
+            <p className="text-white text-sm">{propertyCount.toLocaleString()} properti</p>
+          </div>
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform group-hover:translate-x-0 translate-x-4">
+            <ArrowRight className="text-primary" size={20} />
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+};
+
 const PopularLocations: React.FC = () => {
-  const [locations, setLocations] = useState<LocationImageData[]>([]); // Change type to LocationImageData
+  const [locations, setLocations] = useState<LocationCardProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -29,44 +64,56 @@ const PopularLocations: React.FC = () => {
         isActive: true
       });
       
-      // Sort by name alphabetically
+      // Sort by property count and take top locations
       const sortedLocations = popularLocations
-        .sort((a, b) => a.name.localeCompare(b.name))
+        .sort((a, b) => (b.propertyCount || 0) - (a.propertyCount || 0))
         .slice(0, 6);
       
-      // Map to LocationImageData structure, including images
-      const locationsWithImages: LocationImageData[] = sortedLocations.map((location) => {
+      // Get parent locations for cities/districts
+      const locationWithParents = await Promise.all(sortedLocations.map(async (location) => {
         let provinceName = '';
         
-        // Determine province name for display
-        if (location.type !== 'provinsi' && location.parent_id) {
-          const parentLocation = popularLocations.find(p => p.id === location.parent_id);
-          if (parentLocation) {
-            if (parentLocation.type === 'provinsi') {
-              provinceName = parentLocation.name;
-            } else if (parentLocation.parent_id) {
-              const grandParentLocation = popularLocations.find(gp => gp.id === parentLocation.parent_id);
-              provinceName = grandParentLocation?.name || '';
+        if (location.type !== 'provinsi' && location.parentId) {
+          // For cities, get the province directly
+          if (location.type === 'kota') {
+            const province = popularLocations.find(p => p.id === location.parentId);
+            provinceName = province?.name || '';
+          } 
+          // For districts, get the city first, then the province
+          else if (location.type === 'kecamatan') {
+            const city = popularLocations.find(c => c.id === location.parentId);
+            if (city && city.parentId) {
+              const province = popularLocations.find(p => p.id === city.parentId);
+              provinceName = province?.name || '';
             }
           }
         } else if (location.type === 'provinsi') {
-          provinceName = 'Indonesia'; // For top-level provinces
+          provinceName = 'Indonesia';
         }
         
-        // Find matching image data or use default
-        const imageData = locationImagesData.find(img => img.slug === location.slug) || locationImagesData.find(img => img.slug === 'default');
-
+        // Map location images (in a real app, these would be stored in the database)
+        const locationImages: {[key: string]: string} = {
+          'jakarta-selatan': 'https://images.pexels.com/photos/2437856/pexels-photo-2437856.jpeg',
+          'bandung': 'https://images.pexels.com/photos/2486168/pexels-photo-2486168.jpeg',
+          'surabaya': 'https://images.pexels.com/photos/1538177/pexels-photo-1538177.jpeg',
+          'bali': 'https://images.pexels.com/photos/4112236/pexels-photo-4112236.jpeg',
+          'yogyakarta': 'https://images.pexels.com/photos/2161467/pexels-photo-2161467.jpeg',
+          'semarang': 'https://images.pexels.com/photos/3254729/pexels-photo-3254729.jpeg',
+          'medan': 'https://images.pexels.com/photos/2846217/pexels-photo-2846217.jpeg',
+          'makassar': 'https://images.pexels.com/photos/2111766/pexels-photo-2111766.jpeg',
+          'default': 'https://images.pexels.com/photos/1732414/pexels-photo-1732414.jpeg'
+        };
+        
         return {
-          slug: location.slug,
           name: location.name,
           province: provinceName,
-          coordinates: location.coordinates || undefined,
-          images: imageData ? imageData.images : [], // Use images from the matched data
-          propertyCount: location.property_count || 0, // Add this line
+          image: locationImages[location.slug] || locationImages.default,
+          propertyCount: location.propertyCount || 0,
+          slug: location.slug
         };
-      });
+      }));
       
-      setLocations(locationsWithImages);
+      setLocations(locationWithParents);
     } catch (error) {
       console.error('Error fetching popular locations:', error);
       // Fallback to empty array
@@ -112,25 +159,44 @@ const PopularLocations: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Featured location (larger card) */}
           {locations.length > 0 && (
-            <LocationGalleryCard 
-              locationData={locations[0]}
-              propertyCount={locations[0].propertyCount || 0}
-              isFeatured={true}
-              className="md:col-span-2 lg:col-span-2 md:row-span-2"
-            />
+            <div className="md:col-span-2 md:row-span-2 h-[400px] md:h-auto">
+              <LocationCard 
+                name={locations[0].name}
+                province={locations[0].province}
+                image={locations[0].image}
+                propertyCount={locations[0].propertyCount}
+                slug={locations[0].slug}
+              />
+            </div>
           )}
           
-          {/* Secondary and Additional locations */}
-          {locations.slice(1, 6).map((location, index) => (
-            <LocationGalleryCard 
-              key={location.slug}
-              locationData={location}
-              propertyCount={location.propertyCount || 0}
-              className="lg:col-span-1"
-            />
+          {/* Secondary locations */}
+          {locations.slice(1, 3).map((location, index) => (
+            <div key={location.slug} className="h-[200px]">
+              <LocationCard 
+                name={location.name}
+                province={location.province}
+                image={location.image}
+                propertyCount={location.propertyCount}
+                slug={location.slug}
+              />
+            </div>
+          ))}
+          
+          {/* Additional locations */}
+          {locations.slice(3).map((location, index) => (
+            <div key={location.slug} className="h-[200px]">
+              <LocationCard 
+                name={location.name}
+                province={location.province}
+                image={location.image}
+                propertyCount={location.propertyCount}
+                slug={location.slug}
+              />
+            </div>
           ))}
         </div>
         
