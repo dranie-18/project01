@@ -12,12 +12,13 @@ interface LocationCardProps {
   averageRating?: number; // MODIFIED LINE
 }
 
-const LocationCard: React.FC<LocationCardProps> = ({ 
-  name, 
-  province, 
-  image, 
-  propertyCount, 
-  slug 
+const LocationCard: React.FC<LocationCardProps> = ({
+  name,
+  province,
+  image,
+  propertyCount,
+  slug,
+  averageRating // MODIFIED LINE
 }) => {
   return (
     <Link
@@ -25,9 +26,9 @@ const LocationCard: React.FC<LocationCardProps> = ({
       className="relative overflow-hidden rounded-2xl group h-full"
       aria-label={`Lihat properti di ${name}, ${province}`}
     >
-      <img 
-        src={image} 
-        alt={`Properti di ${name}`} 
+      <img
+        src={image}
+        alt={`Properti di ${name}`}
         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
         loading="lazy"
       />
@@ -39,6 +40,9 @@ const LocationCard: React.FC<LocationCardProps> = ({
           <div>
             <p className="text-neutral-200 text-sm">{province}</p>
             <p className="text-white text-sm">{propertyCount.toLocaleString()} properti</p>
+            {/* NEW CODE: Display average rating placeholder */}
+            <p className="text-neutral-200 text-sm">Rating: {averageRating ? `${averageRating.toFixed(1)}/5` : 'N/A'}</p>
+            {/* END NEW CODE */}
           </div>
           <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform group-hover:translate-x-0 translate-x-4">
             <ArrowRight className="text-primary" size={20} />
