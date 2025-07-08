@@ -9,6 +9,7 @@ interface LocationCardProps {
   image: string;
   propertyCount: number;
   slug: string;
+  averageRating?: number; // MODIFIED LINE
 }
 
 const LocationCard: React.FC<LocationCardProps> = ({ 
