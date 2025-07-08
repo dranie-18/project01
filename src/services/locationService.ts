@@ -133,11 +133,11 @@ class LocationService {
     isActive?: boolean;
     search?: string;
     type?: string;
-  }, orderBy?: { column: string; ascending: boolean }, limit?: number): Promise<Location[]> { // MODIFIED LINE
+  }, orderBy?: { column: string; ascending: boolean }, limit?: number): Promise<Location[]> {
     try {
       let queryBuilder = supabase
         .from('locations')
-        .select('*'); // Keep select('*') to get all columns needed for mapping
+        .select('*, image_url'); // MODIFIED LINE: Added image_url to select
 
       if (filters?.isActive !== undefined) {
         queryBuilder = queryBuilder.eq('is_active', filters.isActive);
@@ -152,16 +152,16 @@ class LocationService {
       }
 
       // Add orderBy clause
-      if (orderBy) { // NEW CODE
-        queryBuilder = queryBuilder.order(orderBy.column, { ascending: orderBy.ascending }); // NEW CODE
-      } else { // NEW CODE - Default order if no orderBy is provided
-        queryBuilder = queryBuilder.order('name'); // NEW CODE
-      } // NEW CODE
+      if (orderBy) {
+        queryBuilder = queryBuilder.order(orderBy.column, { ascending: orderBy.ascending });
+      } else {
+        queryBuilder = queryBuilder.order('name');
+      }
 
       // Add limit clause
-      if (limit) { // NEW CODE
-        queryBuilder = queryBuilder.limit(limit); // NEW CODE
-      } // NEW CODE
+      if (limit) {
+        queryBuilder = queryBuilder.limit(limit);
+      }
 
       const { data, error } = await queryBuilder;
 
