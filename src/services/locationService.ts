@@ -133,12 +133,11 @@ class LocationService {
     isActive?: boolean;
     search?: string;
     type?: string;
-  }): Promise<Location[]> {
+  }, orderBy?: { column: string; ascending: boolean }, limit?: number): Promise<Location[]> { // MODIFIED LINE
     try {
       let queryBuilder = supabase
         .from('locations')
-        .select('*')
-        .order('name');
+        .select('*'); // Keep select('*') to get all columns needed for mapping
 
       if (filters?.isActive !== undefined) {
         queryBuilder = queryBuilder.eq('is_active', filters.isActive);
@@ -151,6 +150,18 @@ class LocationService {
       if (filters?.type) {
         queryBuilder = queryBuilder.eq('type', filters.type);
       }
+
+      // Add orderBy clause
+      if (orderBy) { // NEW CODE
+        queryBuilder = queryBuilder.order(orderBy.column, { ascending: orderBy.ascending }); // NEW CODE
+      } else { // NEW CODE - Default order if no orderBy is provided
+        queryBuilder = queryBuilder.order('name'); // NEW CODE
+      } // NEW CODE
+
+      // Add limit clause
+      if (limit) { // NEW CODE
+        queryBuilder = queryBuilder.limit(limit); // NEW CODE
+      } // NEW CODE
 
       const { data, error } = await queryBuilder;
 
