@@ -11,7 +11,7 @@ interface LocationGalleryCardProps {
 const LocationGalleryCard: React.FC<LocationGalleryCardProps> = ({ locationData, propertyCount }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   // Ensure at least 4 images are available, or use what's there, up to 8
-  const imagesToDisplay = locationData.images.slice(0, Math.min(locationData.images.length, 8));
+  const imagesToDisplay = (locationData.images || []).slice(0, Math.min(locationData.images.length, 8));
 
   const mainImage = imagesToDisplay[currentImageIndex] || imagesToDisplay[0]; // Fallback to first if index out of bounds
 
