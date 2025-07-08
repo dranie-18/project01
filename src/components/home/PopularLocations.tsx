@@ -29,9 +29,9 @@ const PopularLocations: React.FC = () => {
         isActive: true
       });
       
-      // Sort by property count and take top locations
+      // Sort by name alphabetically
       const sortedLocations = popularLocations
-        .sort((a, b) => (b.property_count || 0) - (a.property_count || 0))
+        .sort((a, b) => a.name.localeCompare(b.name))
         .slice(0, 6);
       
       // Map to LocationImageData structure, including images
@@ -62,6 +62,7 @@ const PopularLocations: React.FC = () => {
           province: provinceName,
           coordinates: location.coordinates || undefined,
           images: imageData ? imageData.images : [], // Use images from the matched data
+          propertyCount: location.property_count || 0, // Add this line
         };
       });
       
@@ -111,35 +112,25 @@ const PopularLocations: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {/* Featured location (larger card) */}
           {locations.length > 0 && (
-            <div className="md:col-span-2 md:row-span-2"> {/* Removed fixed height here, let LocationGalleryCard manage */}
-              <LocationGalleryCard 
-                locationData={locations[0]}
-                propertyCount={locations[0].propertyCount || 0} // Pass propertyCount from fetched data
-              />
-            </div>
+            <LocationGalleryCard 
+              locationData={locations[0]}
+              propertyCount={locations[0].propertyCount || 0}
+              isFeatured={true}
+              className="md:col-span-2 lg:col-span-2 md:row-span-2"
+            />
           )}
           
-          {/* Secondary locations */}
-          {locations.slice(1, 3).map((location, index) => (
-            <div key={location.slug} className="h-[200px]"> {/* Maintain height for smaller cards */}
-              <LocationGalleryCard 
-                locationData={location}
-                propertyCount={location.propertyCount || 0}
-              />
-            </div>
-          ))}
-          
-          {/* Additional locations */}
-          {locations.slice(3).map((location, index) => (
-            <div key={location.slug} className="h-[200px]"> {/* Maintain height for smaller cards */}
-              <LocationGalleryCard 
-                locationData={location}
-                propertyCount={location.propertyCount || 0}
-              />
-            </div>
+          {/* Secondary and Additional locations */}
+          {locations.slice(1, 6).map((location, index) => (
+            <LocationGalleryCard 
+              key={location.slug}
+              locationData={location}
+              propertyCount={location.propertyCount || 0}
+              className="lg:col-span-1"
+            />
           ))}
         </div>
         
