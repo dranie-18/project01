@@ -93,7 +93,7 @@ const PopularLocations: React.FC = () => {
         
         // Map location images (in a real app, these would be stored in the database)
         const locationImages: {[key: string]: string} = {
-          'jakarta-selatan': 'https://images.pexels.com/photos/2437856/pexels-photo-2437856.jpeg',
+          'jakarta-selatan': 'LocationGalleryCard',
           'bandung': 'https://images.pexels.com/photos/2486168/pexels-photo-2486168.jpeg',
           'surabaya': 'https://images.pexels.com/photos/1538177/pexels-photo-1538177.jpeg',
           'bali': 'https://images.pexels.com/photos/4112236/pexels-photo-4112236.jpeg',
