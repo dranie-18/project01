@@ -9,7 +9,6 @@ interface LocationCardProps {
   image: string; // This will now be the resolved image URL (from DB or fallback)
   propertyCount: number;
   slug: string;
-  averageRating?: number;
 }
 
 const LocationCard: React.FC<LocationCardProps> = ({
@@ -17,8 +16,7 @@ const LocationCard: React.FC<LocationCardProps> = ({
   province,
   image,
   propertyCount,
-  slug,
-  averageRating
+  slug
 }) => {
   return (
     <Link
@@ -40,7 +38,6 @@ const LocationCard: React.FC<LocationCardProps> = ({
           <div>
             <p className="text-neutral-200 text-sm">{province}</p>
             <p className="text-white text-sm">{propertyCount.toLocaleString()} properti</p>
-            <p className="text-neutral-200 text-sm">Rating: {averageRating ? `${averageRating.toFixed(1)}/5` : 'N/A'}</p>
           </div>
           <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform group-hover:translate-x-0 translate-x-4">
             <ArrowRight className="text-primary" size={20} />
@@ -97,7 +94,6 @@ const PopularLocations: React.FC = () => {
           image: imageUrl, // MODIFIED LINE
           propertyCount: location.property_count || 0, // MODIFIED LINE
           slug: location.slug,
-          averageRating: 4.5
         };
       }));
 
