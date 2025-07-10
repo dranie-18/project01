@@ -224,6 +224,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             phone: userData.phone,
             role: userData.role || 'user',
           },
+          emailRedirectTo: 'http://localhost:3000/auth/callback',
         },
       });
 
