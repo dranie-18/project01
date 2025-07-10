@@ -116,11 +116,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
 
       if (error) {
-        // If profile doesn't exist and this is a new signup, create it
-        if (error.code === 'PGRST116' && userData && retryCount < 3) {
+        // If profile doesn't exist, create it (for both new signups and existing users without profiles)
+        if (error.code === 'PGRST116' && retryCount < 3) {
           console.log('Profile not found, creating new profile...');
           try {
-            const newProfile = await createUserProfile(supabaseUser, userData);
+            // Use provided userData or fallback to user metadata
+            const profileDataForCreation = userData || {
+              fullName: supabaseUser.user_metadata?.full_name || supabaseUser.email?.split('@')[0] || 'User',
+              phone: supabaseUser.user_metadata?.phone || undefined,
+              role: supabaseUser.user_metadata?.role || 'user',
+            };
+            const newProfile = await createUserProfile(supabaseUser, profileDataForCreation);
             return {
               ...newProfile,
               email: supabaseUser.email || '',
@@ -130,7 +136,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // If creation fails, retry fetching in case it was created by trigger
             if (retryCount < 2) {
               await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
-              return fetchUserProfile(supabaseUser, userData, retryCount + 1);
+              return fetchUserProfile(supabaseUser, undefined, retryCount + 1);
             }
             throw createError;
           }
@@ -139,7 +145,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // If it's just a fetch error and we have retry attempts left, try again
         if (retryCount < 2) {
           await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
-          return fetchUserProfile(supabaseUser, userData, retryCount + 1);
+          return fetchUserProfile(supabaseUser, undefined, retryCount + 1);
         }
         
         console.error('Error fetching user profile:', error);
@@ -156,7 +162,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // If this is a network error and we have retries left, try again
       if (retryCount < 2 && (error as any)?.message?.includes('fetch')) {
         await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
-        return fetchUserProfile(supabaseUser, userData, retryCount + 1);
+        return fetchUserProfile(supabaseUser, undefined, retryCount + 1);
       }
       
       throw error;
