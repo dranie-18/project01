@@ -65,7 +65,7 @@ const PopularLocations: React.FC = () => {
       const popularLocations = await locationService.getAllLocations(
         { isActive: true },
         { column: 'property_count', ascending: false },
-        10
+        9
       );
 
       const locationWithParents = await Promise.all(popularLocations.map(async (location) => {
