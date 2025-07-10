@@ -11,6 +11,7 @@ import LocationDetailPage from './pages/LocationDetailPage';
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import AuthCallbackPage from './pages/AuthCallbackPage';
 
 // Premium Pages
 import PremiumUpgradePage from './pages/PremiumUpgradePage';
@@ -67,6 +68,7 @@ function App() {
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
               {/* Premium Routes */}
               <Route path="/premium/upgrade" element={<PremiumUpgradePage />} />
