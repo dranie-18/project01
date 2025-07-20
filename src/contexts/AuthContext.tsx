@@ -7,6 +7,8 @@ type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
 
 export interface User extends UserProfile {
   email: string;
+  email_confirmation_token?: string | null;
+  email_confirmation_sent_at?: string | null;
 }
 
 interface AuthState {
@@ -86,7 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       full_name: userData?.fullName || supabaseUser.user_metadata?.full_name || '',
       phone: userData?.phone || supabaseUser.user_metadata?.phone || null,
       role: (userData?.role || supabaseUser.user_metadata?.role || 'user') as Database['public']['Enums']['user_role'],
-      status: 'active' as Database['public']['Enums']['user_status'],
+      status: 'pending_verification' as Database['public']['Enums']['user_status'], // Set initial status to pending_verification
       avatar_url: null,
       company: null,
       created_at: new Date().toISOString(),
@@ -116,17 +118,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
 
       if (error) {
-        // If profile doesn't exist, create it (for both new signups and existing users without profiles)
-        if (error.code === 'PGRST116' && retryCount < 3) {
+        // If profile doesn't exist and this is a new signup, create it
+        if (error.code === 'PGRST116' && userData && retryCount < 3) {
           console.log('Profile not found, creating new profile...');
           try {
-            // Use provided userData or fallback to user metadata
-            const profileDataForCreation = userData || {
-              fullName: supabaseUser.user_metadata?.full_name || supabaseUser.email?.split('@')[0] || 'User',
-              phone: supabaseUser.user_metadata?.phone || undefined,
-              role: supabaseUser.user_metadata?.role || 'user',
-            };
-            const newProfile = await createUserProfile(supabaseUser, profileDataForCreation);
+            const newProfile = await createUserProfile(supabaseUser, userData);
             return {
               ...newProfile,
               email: supabaseUser.email || '',
@@ -136,7 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // If creation fails, retry fetching in case it was created by trigger
             if (retryCount < 2) {
               await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
-              return fetchUserProfile(supabaseUser, undefined, retryCount + 1);
+              return fetchUserProfile(supabaseUser, userData, retryCount + 1);
             }
             throw createError;
           }
@@ -145,7 +141,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // If it's just a fetch error and we have retry attempts left, try again
         if (retryCount < 2) {
           await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
-          return fetchUserProfile(supabaseUser, undefined, retryCount + 1);
+          return fetchUserProfile(supabaseUser, userData, retryCount + 1);
         }
         
         console.error('Error fetching user profile:', error);
@@ -162,7 +158,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // If this is a network error and we have retries left, try again
       if (retryCount < 2 && (error as any)?.message?.includes('fetch')) {
         await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
-        return fetchUserProfile(supabaseUser, undefined, retryCount + 1);
+        return fetchUserProfile(supabaseUser, userData, retryCount + 1);
       }
       
       throw error;
@@ -230,7 +226,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             phone: userData.phone,
             role: userData.role || 'user',
           },
-          emailRedirectTo: 'http://localhost:3000/auth/callback',
+          // Disable email confirmation from Supabase Auth to handle it manually
+          // This is crucial for custom email confirmation flow
+          emailRedirectTo: `${window.location.origin}/verify-email`, // This is a fallback, our Edge Function will handle the actual link
         },
       });
 
@@ -240,8 +238,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // If email confirmation is disabled, the user will be automatically signed in
       if (data.session) {
+        // User is signed in, but their profile status is 'pending_verification'
+        // Now, call the Edge Function to send the confirmation email
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_EDGE_FUNCTIONS_URL}/send-confirmation-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${data.session.access_token}` // Use user's token for auth
+          },
+          body: JSON.stringify({
+            userId: data.user?.id,
+            email: data.user?.email,
+            userName: userData.fullName,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Failed to trigger confirmation email:', errorData);
+          // Optionally, handle this error by deleting the user or marking them for manual review
+          throw new Error(errorData.error || 'Failed to send confirmation email.');
+        }
+
         handleSessionChange(data.session, userData);
       } else {
+        // This branch might be hit if Supabase requires email confirmation by default
+        // and doesn't sign in the user immediately.
+        // In our setup, we expect `data.session` to be present if `emailRedirectTo` is used.
         dispatch({ type: 'SET_LOADING', payload: false });
       }
     } catch (error) {
@@ -257,8 +280,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password.trim(),
+        email,
+        password,
       });
 
       if (error) {

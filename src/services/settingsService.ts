@@ -133,7 +133,6 @@ class SettingsService {
             full_name: userData.name,
             role: userData.role,
           },
-          emailRedirectTo: 'http://localhost:3000/auth/callback',
         },
       });
       
