@@ -48,14 +48,14 @@ const PremiumFeaturesSummary: React.FC = () => {
   ];
 
   const premiumBenefits = [
-    { icon: Star, title: 'Featured Placement', description: '3x more visibility at top of search results' },
-    { icon: Crown, title: 'Premium Badge', description: 'Golden highlighted border and premium styling' },
-    { icon: Image, title: 'Extended Gallery', description: 'Up to 20 images vs 10 for standard listings' },
-    { icon: Calendar, title: 'Extended Duration', description: '30 days active vs 14 days for standard' },
-    { icon: Eye, title: 'Virtual Tours', description: 'Support for 360° tours and video walkthroughs' },
-    { icon: BarChart, title: 'Analytics Dashboard', description: 'Detailed performance tracking and insights' },
-    { icon: Headphones, title: 'Priority Support', description: '24/7 dedicated customer support' },
-    { icon: TrendingUp, title: 'Social Promotion', description: 'Cross-platform marketing and promotion' }
+    { icon: Star, title: 'Penempatan Unggulan', description: '3x lebih banyak visibilitas di bagian atas hasil pencarian' },
+    { icon: Crown, title: 'Lencana Premium', description: 'Border emas yang disorot dan gaya premium' },
+    { icon: Image, title: 'Galeri Diperluas', description: 'Hingga 20 gambar vs 10 untuk iklan standar' },
+    { icon: Calendar, title: 'Durasi Diperpanjang', description: '30 hari aktif vs 14 hari untuk standar' },
+    { icon: Eye, title: 'Tur Virtual', description: 'Dukungan untuk tur 360° dan video walkthrough' },
+    { icon: BarChart, title: 'Dashboard Analitik', description: 'Pelacakan kinerja dan wawasan terperinci' },
+    { icon: Headphones, title: 'Dukungan Prioritas', description: 'Dukungan pelanggan khusus 24/7' },
+    { icon: TrendingUp, title: 'Promosi Sosial', description: 'Pemasaran dan promosi lintas platform' }
   ];
 
   return (
@@ -93,6 +93,7 @@ const PremiumFeaturesSummary: React.FC = () => {
       {/* Premium Benefits Overview */}
       <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg p-6">
         <h3 className="text-xl font-bold text-yellow-800 mb-4">Premium Features & Benefits</h3>
+        <h3 className="text-xl font-bold text-yellow-800 mb-4">Fitur & Manfaat Premium</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {premiumBenefits.map((benefit, index) => {
             const Icon = benefit.icon;

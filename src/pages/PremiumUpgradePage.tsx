@@ -168,7 +168,7 @@ const PremiumUpgradePage: React.FC = () => {
                 className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold py-4 px-8 rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 flex items-center mx-auto text-lg"
               >
                 <Crown size={24} className="mr-3" />
-                Upgrade to Premium - ${premiumPlan.price}
+                Upgrade ke Premium - ${premiumPlan.price}
               </button>
             </div>
           </div>
@@ -183,7 +183,7 @@ const PremiumUpgradePage: React.FC = () => {
                 className="inline-flex items-center text-neutral-600 hover:text-neutral-800 mb-6"
               >
                 <ArrowLeft size={20} className="mr-2" />
-                Back to Comparison
+                Kembali ke Perbandingan
               </button>
             </div>
             
@@ -203,7 +203,7 @@ const PremiumUpgradePage: React.FC = () => {
                       className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <CreditCard size={20} className="mr-2" />
-                      Continue to Payment
+                      Lanjutkan ke Pembayaran
                     </button>
                   </div>
                 </div>
@@ -229,7 +229,7 @@ const PremiumUpgradePage: React.FC = () => {
                 className="inline-flex items-center text-neutral-600 hover:text-neutral-800 mb-6"
               >
                 <ArrowLeft size={20} className="mr-2" />
-                Back to Payment Method
+                Kembali ke Metode Pembayaran
               </button>
             </div>
             
@@ -260,15 +260,15 @@ const PremiumUpgradePage: React.FC = () => {
         return (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-yellow-500 mx-auto mb-6"></div>
-            <h2 className="text-2xl font-bold text-neutral-800 mb-4">Processing Your Payment</h2>
+            <h2 className="text-2xl font-bold text-neutral-800 mb-4">Memproses Pembayaran Anda</h2>
             <p className="text-neutral-600">
-              Please wait while we process your payment. Do not close this window.
+              Harap tunggu sementara kami memproses pembayaran Anda. Jangan tutup jendela ini.
             </p>
             
             {xenditInvoiceUrl && (
               <div className="mt-6">
                 <p className="text-sm text-neutral-500 mb-2">
-                  If you were not redirected to the payment page, please click the button below:
+                  Jika Anda tidak diarahkan ke halaman pembayaran, silakan klik tombol di bawah:
                 </p>
                 <a
                   href={xenditInvoiceUrl}
@@ -276,7 +276,7 @@ const PremiumUpgradePage: React.FC = () => {
                   rel="noopener noreferrer"
                   className="inline-block bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold py-2 px-4 rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300"
                 >
-                  Go to Payment Page
+                  Ke Halaman Pembayaran
                 </a>
               </div>
             )}
@@ -290,19 +290,19 @@ const PremiumUpgradePage: React.FC = () => {
               <CheckCircle size={40} className="text-green-600" />
             </div>
             <h2 className="text-3xl font-bold text-neutral-800 mb-4">
-              Welcome to Premium!
+              Selamat Datang di Premium!
             </h2>
             <p className="text-lg text-neutral-600 mb-8">
-              Your property listing has been upgraded successfully. Your premium features are now active.
+              Iklan properti Anda telah berhasil di-upgrade. Fitur premium Anda sekarang aktif.
             </p>
             
             <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-8 max-w-md mx-auto">
-              <h3 className="font-semibold text-green-800 mb-2">What's Next?</h3>
+              <h3 className="font-semibold text-green-800 mb-2">Apa Selanjutnya?</h3>
               <ul className="text-sm text-green-700 space-y-1 text-left">
-                <li>• Your listing is now featured at the top of search results</li>
-                <li>• Premium badge and golden border are active</li>
-                <li>• Analytics dashboard is available</li>
-                <li>• You can upload up to 20 images</li>
+                <li>• Iklan Anda sekarang unggulan di bagian atas hasil pencarian</li>
+                <li>• Lencana premium dan border emas sudah aktif</li>
+                <li>• Dashboard analitik tersedia</li>
+                <li>• Anda dapat mengunggah hingga 20 gambar</li>
               </ul>
             </div>
 
@@ -311,23 +311,23 @@ const PremiumUpgradePage: React.FC = () => {
                 onClick={() => navigate(`/dashboard/premium`)}
                 className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 mr-4"
               >
-                View Analytics Dashboard
+                Lihat Dashboard Analitik
               </button>
               <button
                 onClick={() => navigate(`/properti/${propertyId}`)}
                 className="btn-secondary"
               >
-                View Your Listing
+                Lihat Iklan Anda
               </button>
             </div>
 
             {paymentData && (
               <div className="mt-8 p-4 bg-neutral-50 rounded-lg max-w-md mx-auto">
-                <h4 className="font-semibold text-neutral-800 mb-2">Payment Details</h4>
+                <h4 className="font-semibold text-neutral-800 mb-2">Detail Pembayaran</h4>
                 <div className="text-sm text-neutral-600 space-y-1">
                   <p>Transaction ID: {paymentData.transaction_id}</p>
-                  <p>Amount: ${premiumPlan.price}</p>
-                  <p>Status: Completed</p>
+                  <p>Jumlah: ${premiumPlan.price}</p>
+                  <p>Status: Selesai</p>
                 </div>
               </div>
             )}
