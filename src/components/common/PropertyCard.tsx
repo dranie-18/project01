@@ -227,7 +227,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
             {type === 'rumah' ? 'House' : 
              type === 'apartemen' ? 'Apartment' : 
              type === 'kondominium' ? 'Condominium' : 
-             type === 'ruko' ? 'Shop House' : 
+             type === 'ruko' ? 'Ruko' : 
              type === 'tanah' ? 'Land' : 
              type === 'gedung_komersial' ? 'Commercial' : 
              type === 'ruang_industri' ? 'Industrial' : 'Property'}
