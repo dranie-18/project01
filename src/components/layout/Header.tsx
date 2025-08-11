@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, Home, User, Heart, LogIn, LogOut } from 'lucide-react';
+import { 
+  Home, 
+  Menu, 
+  X, 
+  User, 
+  Heart, 
+  Plus, 
+  LogOut,
+  Search
+} from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import logo from '../../assets/logo.svg';
 
 const Header: React.FC = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isAuthenticated, user, signOut } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, isAuthenticated, signOut } = useAuth();
   const navigate = useNavigate();
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
 
   const handleLogout = async () => {
     try {
@@ -22,102 +26,127 @@ const Header: React.FC = () => {
     }
   };
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
-    <header className="sticky top-0 bg-white shadow-md z-50">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
+    <header className="bg-white shadow-sm border-b border-neutral-200 sticky top-0 z-40">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <img src={logo} alt="Properti Pro Logo" className="h-10" />
-            <span className="font-heading font-bold text-2xl text-accent">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <Home size={20} className="text-white" />
+            </div>
+            <span className="font-heading font-bold text-lg text-accent">
               <span className="text-primary">Properti</span> Pro
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="font-medium hover:text-primary transition-colors">
-              Beranda
+          <nav className="hidden md:flex items-center space-x-6">
+            <Link 
+              to="/jual" 
+              className="text-neutral-700 hover:text-primary transition-colors font-medium"
+            >
+              Beli
             </Link>
-            <Link to="/jual" className="font-medium hover:text-primary transition-colors">
-              Jual
-            </Link>
-            <Link to="/sewa" className="font-medium hover:text-primary transition-colors">
+            <Link 
+              to="/sewa" 
+              className="text-neutral-700 hover:text-primary transition-colors font-medium"
+            >
               Sewa
             </Link>
-            <Link to="/agen" className="font-medium hover:text-primary transition-colors">
-              Agen
-            </Link>
-            <Link to="/premium/features" className="font-medium hover:text-primary transition-colors">
+            <Link 
+              to="/premium/features" 
+              className="text-neutral-700 hover:text-primary transition-colors font-medium"
+            >
               Premium
             </Link>
           </nav>
 
-          {/* Desktop Auth Buttons */}
+          {/* User Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            {isAuthenticated ? (
+            {isAuthenticated && user ? (
               <>
-                <Link to="/favorit" className="text-neutral-700 hover:text-primary transition-colors">
+                <Link
+                  to="/user/favorites"
+                  className="p-2 text-neutral-600 hover:text-primary transition-colors"
+                  title="My Favorites"
+                >
                   <Heart size={20} />
                 </Link>
+                <Link
+                  to="/dashboard/listings/new"
+                  className="btn-primary flex items-center text-sm"
+                >
+                  <Plus size={16} className="mr-1" />
+                  Pasang Iklan
+                </Link>
                 <div className="relative group">
-                  <button className="flex items-center space-x-2 text-neutral-700 hover:text-primary transition-colors">
-                    {user?.avatar_url ? (
-                      <img 
-                        src={user.avatar_url} 
-                        alt={user.full_name}
-                        className="w-8 h-8 rounded-full object-cover"
-                      />
-                    ) : (
-                      <User size={20} />
-                    )}
-                    <span>{user?.full_name}</span>
+                  <button className="flex items-center space-x-2 p-2 rounded-lg hover:bg-neutral-100">
+                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                      {user.avatar_url ? (
+                        <img 
+                          src={user.avatar_url} 
+                          alt={user.full_name}
+                          className="w-8 h-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <User size={16} className="text-primary" />
+                      )}
+                    </div>
+                    <span className="text-sm font-medium text-neutral-700">
+                      {user.full_name}
+                    </span>
                   </button>
                   
                   {/* Dropdown Menu */}
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-neutral-200 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                    <Link 
-                      to="/user/profile" 
-                      className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
-                    >
-                      Profil Saya
-                    </Link>
-                    <Link 
-                      to="/user/properties" 
-                      className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
-                    >
-                      Properti Saya
-                    </Link>
-                    <Link 
-                      to="/user/dashboard" 
-                      className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
-                    >
-                      Dashboard
-                    </Link>
-                    {user?.role === 'admin' || user?.role === 'superadmin' ? (
-                      <Link 
-                        to="/admin/dashboard" 
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-neutral-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                    <div className="py-2">
+                      <Link
+                        to="/user/dashboard"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
                       >
-                        Admin Panel
+                        Dashboard
                       </Link>
-                    ) : null}
-                    <hr className="my-1" />
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                    >
-                      Keluar
-                    </button>
+                      <Link
+                        to="/user/profile"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                      >
+                        Profile
+                      </Link>
+                      <Link
+                        to="/user/favorites"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                      >
+                        Favorites
+                      </Link>
+                      <hr className="my-2" />
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                      >
+                        <LogOut size={16} className="inline mr-2" />
+                        Logout
+                      </button>
+                    </div>
                   </div>
                 </div>
               </>
             ) : (
               <>
-                <Link to="/login" className="text-neutral-800 hover:text-primary transition-colors">
+                <Link
+                  to="/login"
+                  className="text-neutral-700 hover:text-primary transition-colors font-medium"
+                >
                   Masuk
                 </Link>
-                <Link to="/register" className="btn-primary">
+                <Link
+                  to="/register"
+                  className="btn-primary text-sm"
+                >
                   Daftar
                 </Link>
               </>
@@ -125,81 +154,98 @@ const Header: React.FC = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <button className="md:hidden" onClick={toggleMenu}>
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          <button
+            onClick={toggleMobileMenu}
+            className="md:hidden p-2 text-neutral-600 hover:text-primary transition-colors"
+            aria-label="Toggle mobile menu"
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
-      </div>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white border-t py-4">
-          <div className="container mx-auto px-4 flex flex-col space-y-4">
-            <Link to="/" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
-              <Home size={20} />
-              <span>Beranda</span>
-            </Link>
-            <Link to="/jual" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
-              <span>Jual</span>
-            </Link>
-            <Link to="/sewa" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
-              <span>Sewa</span>
-            </Link>
-            <Link to="/agen" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
-              <span>Agen</span>
-            </Link>
-            <Link to="/premium/features" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
-              <span>Premium</span>
-            </Link>
-            
-            <hr className="border-neutral-200" />
-            
-            {isAuthenticated ? (
-              <>
-                <Link to="/favorit" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
-                  <Heart size={20} />
-                  <span>Favorit</span>
-                </Link>
-                <Link to="/user/profile" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
-                  <User size={20} />
-                  <span>Profil ({user?.full_name})</span>
-                </Link>
-                <Link to="/user/dashboard" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
-                  <span>Dashboard</span>
-                </Link>
-                <Link to="/user/properties" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
-                  <span>Properti Saya</span>
-                </Link>
-                {user?.role === 'admin' || user?.role === 'superadmin' ? (
-                  <Link to="/admin/dashboard" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
-                    <span>Admin Panel</span>
+        {/* Mobile Navigation */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t border-neutral-200 py-4">
+            <nav className="space-y-2">
+              <Link 
+                to="/jual" 
+                className="block py-2 text-neutral-700 hover:text-primary transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Beli
+              </Link>
+              <Link 
+                to="/sewa" 
+                className="block py-2 text-neutral-700 hover:text-primary transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Sewa
+              </Link>
+              <Link 
+                to="/premium/features" 
+                className="block py-2 text-neutral-700 hover:text-primary transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Premium
+              </Link>
+              
+              {isAuthenticated && user ? (
+                <>
+                  <hr className="my-2" />
+                  <Link
+                    to="/user/dashboard"
+                    className="block py-2 text-neutral-700 hover:text-primary transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Dashboard
                   </Link>
-                ) : null}
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    toggleMenu();
-                  }}
-                  className="flex items-center space-x-2 py-2 text-red-600"
-                >
-                  <LogOut size={20} />
-                  <span>Keluar</span>
-                </button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="flex items-center space-x-2 py-2" onClick={toggleMenu}>
-                  <LogIn size={20} />
-                  <span>Masuk</span>
-                </Link>
-                <Link to="/register" className="btn-primary text-center" onClick={toggleMenu}>
-                  Daftar
-                </Link>
-              </>
-            )}
+                  <Link
+                    to="/user/favorites"
+                    className="block py-2 text-neutral-700 hover:text-primary transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Favorites
+                  </Link>
+                  <Link
+                    to="/dashboard/listings/new"
+                    className="block py-2 text-primary font-medium"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    + Pasang Iklan
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="block w-full text-left py-2 text-red-600"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <hr className="my-2" />
+                  <Link
+                    to="/login"
+                    className="block py-2 text-neutral-700 hover:text-primary transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Masuk
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="block py-2 text-primary font-medium"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Daftar
+                  </Link>
+                </>
+              )}
+            </nav>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </header>
   );
 };

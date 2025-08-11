@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { 
   Heart, 
   MapPin, 
@@ -21,10 +22,11 @@ import {
 } from 'lucide-react';
 import { Property } from '../../types';
 import { formatPrice } from '../../utils/formatter';
-import { premiumService } from '../../services/premiumService';
 import PremiumPropertyCard from '../premium/PremiumPropertyCard';
 import { getFeatureLabelById } from '../../types/listing';
-import { useToast } from '../../contexts/ToastContext'; // ADD THIS LINE
+import { favoriteService } from '../../services/favoriteService';
+import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../../contexts/ToastContext';
 
 interface PropertyCardProps {
   property: Property;
@@ -76,57 +78,83 @@ const featureIcons: Record<string, React.ElementType> = {
 };
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
-  const [premiumListing, setPremiumListing] = React.useState<any>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const { showError } = useToast();
+  const { user, isAuthenticated } = useAuth();
+  const { showSuccess, showError, showInfo } = useToast();
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
 
-  React.useEffect(() => {
-    checkPremiumStatus();
-  }, [property.id]);
+  // Check if property is favorited when component mounts
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      checkFavoriteStatus();
+    }
+  }, [isAuthenticated, user, property.id]);
 
-  const checkPremiumStatus = async () => {
-    setIsLoading(true);
+  const checkFavoriteStatus = async () => {
+    if (!user) return;
+    
     try {
-      const premium = await premiumService.getPremiumListing(property.id);
-      setPremiumListing(premium);
-    } catch (error: any) { // MODIFIED: Catch error as 'any'
-      // Handle network errors gracefully without breaking the UI
-      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-        console.warn('Network error checking premium status - displaying as regular property card');
-        showError('Network Error', 'Could not load premium status. Displaying basic property card.'); // ADDED: User feedback
+      const favorited = await favoriteService.isFavorited(property.id, user.id);
+      setIsFavorited(favorited);
+    } catch (error) {
+      console.error('Error checking favorite status:', error);
+    }
+  };
+
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isAuthenticated || !user) {
+      showInfo(
+        'Login Required',
+        'Please log in to save properties to your favorites.'
+      );
+      return;
+    }
+
+    setIsToggling(true);
+
+    try {
+      const result = await favoriteService.toggleFavorite(property.id, user.id);
+      
+      if (result.success) {
+        setIsFavorited(result.isFavorited);
+        
+        if (result.isFavorited) {
+          showSuccess(
+            'Property Saved',
+            'Property has been added to your favorites.'
+          );
+        } else {
+          showSuccess(
+            'Property Removed',
+            'Property has been removed from your favorites.'
+          );
+        }
       } else {
-        console.error('Error checking premium status:', error);
-        showError('Error', error.message || 'Failed to load premium status.'); // ADDED: User feedback
+        showError(
+          'Error',
+          'Failed to update favorites. Please try again.'
+        );
       }
-      // Ensure premium listing is set to null so regular card is displayed
-      setPremiumListing(null);
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      showError(
+        'Error',
+        'Failed to update favorites. Please try again.'
+      );
     } finally {
-      setIsLoading(false);
+      setIsToggling(false);
     }
   };
 
-  const handleAnalyticsUpdate = (type: 'view' | 'inquiry' | 'favorite') => {
-    if (premiumListing) {
-      premiumService.updateAnalytics(property.id, type);
-    }
-  };
-
-  // If property has premium listing, use PremiumPropertyCard
-  // MODIFIED: Only render PremiumPropertyCard if not loading and premiumListing is available
-  if (isLoading) {
-    return (
-      <div className="card group flex items-center justify-center h-64">
-        <Loader size={32} className="animate-spin text-primary" /> {/* ADDED: Loader */}
-      </div>
-    );
-  }
-
-  if (premiumListing) {
+  // Check if property has premium details
+  if (property.premiumDetails) {
     return (
       <PremiumPropertyCard 
         property={property} 
-        premiumListing={premiumListing}
-        onAnalyticsUpdate={handleAnalyticsUpdate}
+        premiumListing={property.premiumDetails}
       />
     );
   }
@@ -169,10 +197,20 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
         </Link>
         <div className="absolute top-2 right-2 z-10">
           <button 
-            className="bg-white p-1.5 rounded-full shadow-md hover:bg-primary hover:text-white transition-colors duration-300"
+            onClick={handleFavoriteClick}
+            disabled={isToggling}
+            className={`p-1.5 rounded-full shadow-md transition-colors duration-300 ${
+              isFavorited 
+                ? 'bg-red-500 text-white hover:bg-red-600' 
+                : 'bg-white text-neutral-600 hover:bg-primary hover:text-white'
+            } ${isToggling ? 'opacity-50 cursor-not-allowed' : ''}`}
             aria-label="Simpan properti ini"
           >
-            <Heart size={18} />
+            {isToggling ? (
+              <Loader size={18} className="animate-spin" />
+            ) : (
+              <Heart size={18} className={isFavorited ? 'fill-current' : ''} />
+            )}
           </button>
         </div>
         <div className="absolute top-2 left-2 z-10">
