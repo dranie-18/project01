@@ -63,8 +63,6 @@ interface AuthContextType extends AuthState {
   updatePassword: (password: string) => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
   clearError: () => void;
-  isAdmin: () => boolean;
-  isSuperAdmin: () => boolean;
   refreshSession: () => Promise<void>;
 }
 
@@ -228,7 +226,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           },
           // Disable email confirmation from Supabase Auth to handle it manually
           // This is crucial for custom email confirmation flow
-          emailRedirectTo: `${window.location.origin}/verify-email`, // This is a fallback, our Edge Function will handle the actual link
+          role: userData.role || 'user'
         },
       });
 
@@ -399,14 +397,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     dispatch({ type: 'CLEAR_ERROR' });
   }, [dispatch]);
 
-  const isAdmin = () => {
-    return state.user?.role === 'admin' || state.user?.role === 'superadmin';
-  };
-
-  const isSuperAdmin = () => {
-    return state.user?.role === 'superadmin';
-  };
-
   const value: AuthContextType = {
     ...state,
     signUp,
@@ -416,8 +406,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     updatePassword,
     updateProfile,
     clearError,
-    isAdmin,
-    isSuperAdmin,
     refreshSession,
   };
 

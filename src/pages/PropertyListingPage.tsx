@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, useParams, useSearchParams } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import PropertyCard from '../components/common/PropertyCard';
 import SearchBox from '../components/common/SearchBox';
 import { Property } from '../types';
-import { premiumService } from '../services/premiumService';
 import { 
   GridIcon, 
   List, 
@@ -53,7 +52,9 @@ const PropertyListingPage: React.FC = () => {
   const maxFloors = searchParams.get('maxFloors') ? Number(searchParams.get('maxFloors')) : undefined;
   
   // Get features from URL parameters (can be multiple)
-  const featuresFromUrl = searchParams.getAll('features');
+  const featuresFromUrl = useMemo(() => {
+    return searchParams.getAll('features');
+  }, [searchParams]);
   
   const [properties, setProperties] = useState<Property[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -83,7 +84,7 @@ const PropertyListingPage: React.FC = () => {
     maxLandSize: maxLandSize?.toString() || '',
     minFloors: minFloors?.toString() || '',
     maxFloors: maxFloors?.toString() || '',
-    features: [...featuresFromUrl]
+    features: featuresFromUrl
   });
   
   useEffect(() => {
@@ -115,6 +116,21 @@ const PropertyListingPage: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
+      console.log('PropertyListingPage: Fetching properties with filters:', {
+        purpose,
+        type: propertyType,
+        location: { province, city, district },
+        priceRange: [minPrice, maxPrice],
+        bedrooms: [minBedrooms, maxBedrooms],
+        bathrooms: [minBathrooms, maxBathrooms],
+        buildingSize: [minBuildingSize, maxBuildingSize],
+        landSize: [minLandSize, maxLandSize],
+        floors: [minFloors, maxFloors],
+        features: featuresFromUrl,
+        sortBy,
+        page: currentPage
+      });
+      
       // Prepare filters
       const filters: any = {
         purpose,
@@ -157,6 +173,7 @@ const PropertyListingPage: React.FC = () => {
         filters.features = featuresFromUrl;
       }
       
+      console.log('PropertyListingPage: Calling listingService.getAllListings...');
       // Fetch properties
       const { data, count } = await listingService.getAllListings(
         filters,
@@ -164,12 +181,17 @@ const PropertyListingPage: React.FC = () => {
         pageSize
       );
       
+      console.log('PropertyListingPage: Properties fetched successfully:', data.length, 'properties, total count:', count);
+      console.log('Properties fetched successfully:', data.length, 'properties, total count:', count);
       setProperties(data);
       setTotalCount(count);
     } catch (error: any) { // MODIFIED: Catch error as 'any' for message access
-      console.error('Error fetching properties:', error);
-      setError(error.message || 'Failed to load properties. Please try again.'); // ADDED: Set error message
+      console.error('PropertyListingPage: Error fetching properties:', error);
+      setError(error.message || 'Failed to load properties. Please try again.');
       showError('Error', error.message || 'Failed to load properties. Please try again.');
+      // Set empty data on error
+      setProperties([]);
+      setTotalCount(0);
     } finally {
       setIsLoading(false);
     }
@@ -186,9 +208,10 @@ const PropertyListingPage: React.FC = () => {
   
   const toggleFeature = (featureId: string) => {
     setLocalFilters(prev => {
-      const newFeatures = prev.features.includes(featureId)
-        ? prev.features.filter(id => id !== featureId)
-        : [...prev.features, featureId];
+      const currentFeatures = Array.isArray(prev.features) ? prev.features : [];
+      const newFeatures = currentFeatures.includes(featureId)
+        ? currentFeatures.filter(id => id !== featureId)
+        : [...currentFeatures, featureId];
       
       return {
         ...prev,
@@ -280,9 +303,11 @@ const PropertyListingPage: React.FC = () => {
     
     // Update features filters
     newParams.delete('features');
-    localFilters.features.forEach(feature => {
-      newParams.append('features', feature);
-    });
+    if (Array.isArray(localFilters.features)) {
+      localFilters.features.forEach(feature => {
+        newParams.append('features', feature);
+      });
+    }
     
     // Reset to page 1 when filters change
     newParams.delete('page');
@@ -314,7 +339,7 @@ const PropertyListingPage: React.FC = () => {
       maxLandSize: '',
       minFloors: '',
       maxFloors: '',
-      features: []
+      features: featuresFromUrl
     });
   };
   
@@ -653,7 +678,7 @@ const PropertyListingPage: React.FC = () => {
                                 <input
                                   type="checkbox"
                                   id={`filter-feature-${feature.id}`}
-                                  checked={localFilters.features.includes(feature.id)}
+                                  checked={Array.isArray(localFilters.features) && localFilters.features.includes(feature.id)}
                                   onChange={() => toggleFeature(feature.id)}
                                   className="h-4 w-4 text-primary border-neutral-300 rounded focus:ring-primary"
                                 />

@@ -2,6 +2,8 @@ import { supabase } from '../lib/supabase';
 import { Property, PropertyType, ListingStatus } from '../types';
 import { User } from '../contexts/AuthContext';
 import { ListingFormData, UserListing } from '../types/listing';
+import { premiumService } from './premiumService';
+import { PremiumListing } from '../types/premium';
 
 class ListingService {
   async getAllListings(filters?: ListingFilters, page: number = 1, pageSize: number = 10): Promise<{
@@ -9,6 +11,8 @@ class ListingService {
     count: number;
   }> {
     try {
+      console.log('getAllListings called with filters:', filters, 'page:', page, 'pageSize:', pageSize);
+      
       let query = supabase
         .from('listings')
         .select(`
@@ -17,7 +21,8 @@ class ListingService {
           province:locations!listings_province_id_fkey(name),
           city:locations!listings_city_id_fkey(name),
           district:locations!listings_district_id_fkey(name),
-          agent_profile:user_profiles(full_name, phone, company, avatar_url) // MODIFIED: Removed 'email'
+          agent_profile:user_profiles(full_name, phone, company, avatar_url),
+          premium_listings!fk_premium_property(*)
         `, { count: 'exact' });
 
       // Apply filters
@@ -158,21 +163,90 @@ class ListingService {
       const to = from + pageSize - 1;
       query = query.range(from, to);
       
+      console.log('Executing main listings query...');
       const { data, error, count } = await query;
       
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase query error in getAllListings:', error);
+        throw error;
+      }
 
+      console.log('Main listings query successful, enriching with related data...');
       const enrichedListings = await this._enrichListingsWithRelatedData(data || []);
       
-      let properties: Property[] = this.mapDbListingsToProperties(enrichedListings);
+      let properties: Property[] = await this.mapDbListingsToProperties(enrichedListings);
       
+      // Ensure properties is always an array
+      if (!Array.isArray(properties)) {
+        console.error('mapDbListingsToProperties did not return an array, forcing to empty array:', properties);
+        properties = [];
+      }
+      
+      console.log('getAllListings completed successfully, returning', properties.length, 'properties');
       return {
         data: properties,
         count: count || 0
       };
     } catch (error) {
-      console.error('Error fetching listings:', error);
-      return { data: [], count: 0 };
+      // Enhanced network error detection
+      const isNetworkError = (err: any): boolean => {
+        if (!err) return false;
+        
+        // Check if it's a TypeError
+        if (err instanceof TypeError) return true;
+        
+        // Check error message (case-insensitive)
+        const message = (err.message || '').toLowerCase();
+        if (message.includes('failed to fetch') || 
+            message.includes('networkerror') || 
+            message.includes('fetch') ||
+            message.includes('network') ||
+            message.includes('connection') ||
+            message.includes('timeout')) {
+          return true;
+        }
+        
+        // Check error name (case-insensitive)
+        const name = (err.name || '').toLowerCase();
+        if (name.includes('networkerror') || 
+            name.includes('typeerror') ||
+            name.includes('fetcherror')) {
+          return true;
+        }
+        
+        // Check error details (case-insensitive)
+        const details = (err.details || '').toLowerCase();
+        if (details.includes('failed to fetch') || 
+            details.includes('network') ||
+            details.includes('connection')) {
+          return true;
+        }
+        
+        // Check error code
+        if (err.code === 'NETWORK_ERROR' || err.code === 'FETCH_ERROR') {
+          return true;
+        }
+        
+        // Check if error cause contains network-related messages
+        if (err.cause && typeof err.cause === 'object') {
+          const causeMessage = (err.cause.message || '').toLowerCase();
+          if (causeMessage.includes('failed to fetch') || 
+              causeMessage.includes('network') ||
+              causeMessage.includes('connection')) {
+            return true;
+          }
+        }
+        
+        return false;
+      };
+      
+      if (isNetworkError(error)) {
+        console.warn('Network error fetching listings - Supabase may be unreachable:', error);
+        return { data: [], count: 0 };
+      }
+      
+      console.error('Unexpected error fetching listings:', error);
+      throw error; // Re-throw non-network errors so calling components can handle them
     }
   }
 
@@ -189,7 +263,8 @@ class ListingService {
           province:locations!listings_province_id_fkey(name),
           city:locations!listings_city_id_fkey(name),
           district:locations!listings_district_id_fkey(name),
-          agent_profile:user_profiles(full_name, phone, company, avatar_url) // MODIFIED: Removed 'email'
+          agent_profile:user_profiles(full_name, phone, company, avatar_url),
+          premium_listings!fk_premium_property(*)
         `)
         .eq('id', id)
         .single();
@@ -200,7 +275,65 @@ class ListingService {
       return this.mapDbListingToProperty(listing);
     } catch (error) {
       console.error('Error fetching listing:', error);
-      throw error;
+      
+      // Enhanced network error detection
+      const isNetworkError = (err: any): boolean => {
+        if (!err) return false;
+        
+        // Check if it's a TypeError
+        if (err instanceof TypeError) return true;
+        
+        // Check error message (case-insensitive)
+        const message = (err.message || '').toLowerCase();
+        if (message.includes('failed to fetch') || 
+            message.includes('networkerror') || 
+            message.includes('fetch') ||
+            message.includes('network') ||
+            message.includes('connection') ||
+            message.includes('timeout')) {
+          return true;
+        }
+        
+        // Check error name (case-insensitive)
+        const name = (err.name || '').toLowerCase();
+        if (name.includes('networkerror') || 
+            name.includes('typeerror') ||
+            name.includes('fetcherror')) {
+          return true;
+        }
+        
+        // Check error details (case-insensitive)
+        const details = (err.details || '').toLowerCase();
+        if (details.includes('failed to fetch') || 
+            details.includes('network') ||
+            details.includes('connection')) {
+          return true;
+        }
+        
+        // Check error code
+        if (err.code === 'NETWORK_ERROR' || err.code === 'FETCH_ERROR') {
+          return true;
+        }
+        
+        // Check if error cause contains network-related messages
+        if (err.cause && typeof err.cause === 'object') {
+          const causeMessage = (err.cause.message || '').toLowerCase();
+          if (causeMessage.includes('failed to fetch') || 
+              causeMessage.includes('network') ||
+              causeMessage.includes('connection')) {
+            return true;
+          }
+        }
+        
+        return false;
+      };
+      
+      if (isNetworkError(error)) {
+        console.warn('Network error fetching listing by ID - returning null:', error);
+        return null; // Return null for network errors
+      }
+      
+      throw error; // Re-throw non-network errors
     }
   }
 
@@ -283,7 +416,65 @@ class ListingService {
       return userListings;
     } catch (error) {
       console.error('Error fetching user listings:', error);
-      throw error; // RE-THROW ERROR: Allow calling component to handle it
+      
+      // Enhanced network error detection
+      const isNetworkError = (err: any): boolean => {
+        if (!err) return false;
+        
+        // Check if it's a TypeError
+        if (err instanceof TypeError) return true;
+        
+        // Check error message (case-insensitive)
+        const message = (err.message || '').toLowerCase();
+        if (message.includes('failed to fetch') || 
+            message.includes('networkerror') || 
+            message.includes('fetch') ||
+            message.includes('network') ||
+            message.includes('connection') ||
+            message.includes('timeout')) {
+          return true;
+        }
+        
+        // Check error name (case-insensitive)
+        const name = (err.name || '').toLowerCase();
+        if (name.includes('networkerror') || 
+            name.includes('typeerror') ||
+            name.includes('fetcherror')) {
+          return true;
+        }
+        
+        // Check error details (case-insensitive)
+        const details = (err.details || '').toLowerCase();
+        if (details.includes('failed to fetch') || 
+            details.includes('network') ||
+            details.includes('connection')) {
+          return true;
+        }
+        
+        // Check error code
+        if (err.code === 'NETWORK_ERROR' || err.code === 'FETCH_ERROR') {
+          return true;
+        }
+        
+        // Check if error cause contains network-related messages
+        if (err.cause && typeof err.cause === 'object') {
+          const causeMessage = (err.cause.message || '').toLowerCase();
+          if (causeMessage.includes('failed to fetch') || 
+              causeMessage.includes('network') ||
+              causeMessage.includes('connection')) {
+            return true;
+          }
+        }
+        
+        return false;
+      };
+      
+      if (isNetworkError(error)) {
+        console.warn('Network error fetching user listings - returning empty array:', error);
+        return []; // Return empty array for network errors
+      }
+      
+      throw error; // Re-throw non-network errors for calling component to handle
     }
   }
   
@@ -473,9 +664,22 @@ class ListingService {
    */
   async incrementViewCount(id: string): Promise<void> {
     try {
-      await supabase.rpc('increment_listing_views', { listing_id: id });
+      // Check if id is a valid UUID format before making the RPC call
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(id)) {
+        console.warn('Invalid UUID format for listing ID:', id);
+        return;
+      }
+      
+      await supabase.rpc('increment_listing_views', { p_listing_id: id });
     } catch (error) {
-      console.error('Error incrementing view count:', error);
+      // Handle the specific bigint type error gracefully
+      if (error && typeof error === 'object' && 'code' in error && error.code === '22P02') {
+        console.warn('Database function increment_listing_views expects bigint but received UUID. This needs to be fixed in the database function definition.');
+      } else {
+        console.error('Error incrementing view count:', error);
+      }
+      // Don't throw the error to prevent breaking the user experience
     }
   }
 
@@ -484,9 +688,22 @@ class ListingService {
    */
   async incrementInquiryCount(id: string): Promise<void> {
     try {
-      await supabase.rpc('increment_listing_inquiries', { listing_id: id });
+      // Check if id is a valid UUID format before making the RPC call
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(id)) {
+        console.warn('Invalid UUID format for listing ID:', id);
+        return;
+      }
+      
+      await supabase.rpc('increment_listing_inquiries', { p_listing_id: id });
     } catch (error) {
-      console.error('Error incrementing inquiry count:', error);
+      // Handle the specific bigint type error gracefully
+      if (error && typeof error === 'object' && 'code' in error && error.code === '22P02') {
+        console.warn('Database function increment_listing_inquiries expects bigint but received UUID. This needs to be fixed in the database function definition.');
+      } else {
+        console.error('Error incrementing inquiry count:', error);
+      }
+      // Don't throw the error to prevent breaking the user experience
     }
   }
 
@@ -494,6 +711,8 @@ class ListingService {
     if (!listings.length) return [];
     
     try {
+      console.log('Enriching', listings.length, 'listings with related data...');
+      
       // Extract all unique IDs needed for related data
       const listingIds = listings.map(listing => listing.id);
       const provinceIds = [...new Set(listings.map(listing => listing.province_id).filter(Boolean))];
@@ -501,30 +720,42 @@ class ListingService {
       const districtIds = [...new Set(listings.map(listing => listing.district_id).filter(Boolean))];
       const userIds = [...new Set(listings.map(listing => listing.user_id).filter(Boolean))];
       
+      console.log('Fetching media for', listingIds.length, 'listings...');
       // Fetch all media for these listings in one batch
       const { data: allMedia, error: mediaError } = await supabase
         .from('property_media')
         .select('listing_id, media_url, is_primary')
         .in('listing_id', listingIds);
-      if (mediaError) throw mediaError;
+      if (mediaError) {
+        console.error('Error fetching property media:', mediaError);
+        // Don't throw, continue without media data
+      }
 
+      console.log('Fetching locations for provinces:', provinceIds.length, 'cities:', cityIds.length, 'districts:', districtIds.length);
       // Fetch all locations in one batch
       const { data: allLocations, error: locationsError } = await supabase
         .from('locations')
         .select('id, name, type')
         .in('id', [...provinceIds, ...cityIds, ...districtIds]);
-      if (locationsError) throw locationsError;
+      if (locationsError) {
+        console.error('Error fetching locations:', locationsError);
+        // Don't throw, continue without location data
+      }
       
+      console.log('Fetching user profiles for', userIds.length, 'users...');
       // Fetch all user profiles in one batch
       const { data: allUsers, error: usersError } = await supabase
         .from('user_profiles')
         .select('id, full_name, phone, company, avatar_url')
         .in('id', userIds);
-      if (usersError) throw usersError;
+      if (usersError) {
+        console.error('Error fetching user profiles:', usersError);
+        // Don't throw, continue without user data
+      }
       
       // Create lookup maps for quick access
       const mediaByListingId = new Map();
-      if (allMedia) {
+      if (allMedia && !mediaError) {
         allMedia.forEach(media => {
           if (!mediaByListingId.has(media.listing_id)) {
             mediaByListingId.set(media.listing_id, []);
@@ -534,19 +765,20 @@ class ListingService {
       }
       
       const locationsById = new Map();
-      if (allLocations) {
+      if (allLocations && !locationsError) {
         allLocations.forEach(location => {
           locationsById.set(location.id, location);
         });
       }
       
       const usersById = new Map();
-      if (allUsers) {
+      if (allUsers && !usersError) {
         allUsers.forEach(user => {
           usersById.set(user.id, user);
         });
       }
       
+      console.log('Enriching listings with fetched data...');
       // Enrich each listing with its related data
       return listings.map(listing => {
         // Add media
@@ -570,8 +802,73 @@ class ListingService {
         };
       });
     } catch (error) {
-      console.error('Error enriching listings with related data:', error);
-      throw error; // Re-throw to be caught by calling function
+      // Enhanced network error detection
+      const isNetworkError = (err: any): boolean => {
+        if (!err) return false;
+        
+        // Check if it's a TypeError
+        if (err instanceof TypeError) return true;
+        
+        // Check error message (case-insensitive)
+        const message = (err.message || '').toLowerCase();
+        if (message.includes('failed to fetch') || 
+            message.includes('networkerror') || 
+            message.includes('fetch') ||
+            message.includes('network') ||
+            message.includes('connection') ||
+            message.includes('timeout')) {
+          return true;
+        }
+        
+        // Check error name (case-insensitive)
+        const name = (err.name || '').toLowerCase();
+        if (name.includes('networkerror') || 
+            name.includes('typeerror') ||
+            name.includes('fetcherror')) {
+          return true;
+        }
+        
+        // Check error details (case-insensitive)
+        const details = (err.details || '').toLowerCase();
+        if (details.includes('failed to fetch') || 
+            details.includes('network') ||
+            details.includes('connection')) {
+          return true;
+        }
+        
+        // Check error code
+        if (err.code === 'NETWORK_ERROR' || err.code === 'FETCH_ERROR') {
+          return true;
+        }
+        
+        // Check if error cause contains network-related messages
+        if (err.cause && typeof err.cause === 'object') {
+          const causeMessage = (err.cause.message || '').toLowerCase();
+          if (causeMessage.includes('failed to fetch') || 
+              causeMessage.includes('network') ||
+              causeMessage.includes('connection')) {
+            return true;
+          }
+        }
+        
+        return false;
+      };
+      
+      if (isNetworkError(error)) {
+        console.warn('Network error enriching listings with related data - returning basic data:', error.message);
+        // Return listings without enriched data
+        return listings.map(listing => ({
+          ...listing,
+          _property_media: [],
+          _province_name: '',
+          _city_name: '',
+          _district_name: '',
+          _agent_profile: null
+        }));
+      }
+      
+      console.error('Unexpected error enriching listings with related data:', error);
+      throw error; // Re-throw non-network errors
     }
   }
 
@@ -727,6 +1024,17 @@ class ListingService {
     const city = dbListing._city_name || '';
     const district = dbListing._district_name || '';
     
+    // Process premium listing details
+    let premiumDetails = null;
+    if (dbListing.premium_listings && Array.isArray(dbListing.premium_listings)) {
+      const activePremium = dbListing.premium_listings.find(premium => 
+        premium.status === 'active' && new Date(premium.end_date) > new Date()
+      );
+      if (activePremium) {
+        premiumDetails = activePremium;
+      }
+    }
+    
     let images = ['https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg'];
     if (dbListing.property_media && dbListing.property_media.length > 0) {
       images = dbListing.property_media.map((media: any) => media.media_url);
@@ -771,12 +1079,127 @@ class ListingService {
       isPromoted: dbListing.is_promoted,
       status: dbListing.status as ListingStatus,
       views: dbListing.views,
-      inquiries: dbListing.inquiries
+      inquiries: dbListing.inquiries,
+      premiumDetails
     };
   }
 
-  private mapDbListingsToProperties(dbListings: any[]): Property[] {
-    return dbListings.map(listing => this.mapDbListingToProperty(listing));
+  private async mapDbListingsToProperties(dbListings: any[]): Promise<Property[]> {
+    // Defensive check to ensure dbListings is an array
+    if (!Array.isArray(dbListings)) {
+      console.error('mapDbListingsToProperties received non-array input:', typeof dbListings, dbListings);
+      return [];
+    }
+    
+    // Fetch premium plans once for all listings to avoid repeated calls
+    let premiumPlans: any[] = [];
+    try {
+      premiumPlans = await premiumService.getPremiumPlans();
+    } catch (error) {
+      console.error('Error fetching premium plans for mapping:', error);
+    }
+    
+    // Process all listings in parallel for better performance
+    const propertyPromises = dbListings.map(async (listing) => {
+      // Process premium listing details
+      let premiumDetails: PremiumListing | null = null;
+      if (listing.premium_listings && Array.isArray(listing.premium_listings)) {
+        const activePremium = listing.premium_listings.find(premium => 
+          premium.status === 'active' && new Date(premium.end_date) > new Date()
+        );
+        if (activePremium) {
+          try {
+            const plan = premiumPlans.find(p => p.id === activePremium.plan_id);
+            if (plan) {
+              premiumDetails = premiumService.transformDbRecordToPremiumListing(activePremium, plan);
+            }
+          } catch (error) {
+            console.error('Error transforming premium listing data:', error);
+            // Fallback: create a basic structure to prevent crashes
+            premiumDetails = {
+              id: activePremium.id,
+              propertyId: activePremium.property_id,
+              userId: activePremium.user_id,
+              planId: activePremium.plan_id,
+              status: activePremium.status,
+              startDate: activePremium.start_date,
+              endDate: activePremium.end_date,
+              paymentId: activePremium.payment_id,
+              analytics: {
+                views: activePremium.analytics_views || 0,
+                inquiries: activePremium.analytics_inquiries || 0,
+                favorites: activePremium.analytics_favorites || 0,
+                conversionRate: activePremium.analytics_conversion_rate || 0
+              },
+              createdAt: activePremium.created_at,
+              updatedAt: activePremium.updated_at
+            };
+          }
+        }
+      }
+      
+      const province = listing._province_name || '';
+      const city = listing._city_name || '';
+      const district = listing._district_name || '';
+      
+      let images = ['https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg'];
+      if (listing.property_media && listing.property_media.length > 0) {
+        images = listing.property_media.map((media: any) => media.media_url);
+      }
+      
+      const agentProfile = listing.agent_profile || {};
+      const agent = {
+        id: listing.user_id,
+        name: agentProfile.full_name || 'Agent',
+        phone: agentProfile.phone || '',
+        email: '', 
+        avatar: agentProfile.avatar_url,
+        company: agentProfile.company
+      };
+      
+      const propertyType = listing.property_type as PropertyType;
+      
+      return {
+        id: listing.id,
+        title: listing.title,
+        description: listing.description,
+        price: listing.price,
+        priceUnit: listing.price_unit,
+        type: propertyType,
+        purpose: listing.purpose,
+        bedrooms: listing.bedrooms || undefined,
+        bathrooms: listing.bathrooms || undefined,
+        buildingSize: listing.building_size || undefined,
+        landSize: listing.land_size || undefined,
+        floors: listing.floors || undefined,
+        location: {
+          province,
+          city,
+          district,
+          address: listing.address || '',
+          postalCode: listing.postal_code || undefined
+        },
+        images,
+        features: listing.features || [],
+        agent,
+        createdAt: listing.created_at,
+        isPromoted: listing.is_promoted,
+        status: listing.status as ListingStatus,
+        views: listing.views,
+        inquiries: listing.inquiries,
+        premiumDetails
+      };
+    });
+    
+    const result = await Promise.all(propertyPromises);
+    
+    // Defensive check to ensure we always return an array
+    if (!Array.isArray(result)) {
+      console.error('Promise.all did not return an array in mapDbListingsToProperties, got:', typeof result, result);
+      return [];
+    }
+    
+    return result;
   }
 
   /**

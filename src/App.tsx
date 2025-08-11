@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './contexts/AuthContext';
@@ -16,45 +16,45 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import EmailConfirmationSuccessPage from './pages/EmailConfirmationSuccessPage';
 import EmailConfirmationFailurePage from './pages/EmailConfirmationFailurePage';
 
-// Premium Pages
 import PremiumUpgradePage from './pages/PremiumUpgradePage';
 import PremiumDashboardPage from './pages/PremiumDashboardPage';
 import PremiumFeaturesPage from './pages/PremiumFeaturesPage';
 
-// Payment Pages
 import PaymentSuccessPage from './pages/payment/PaymentSuccessPage';
 import PaymentFailurePage from './pages/payment/PaymentFailurePage';
 
-// User Dashboard Pages
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import DashboardOverview from './pages/dashboard/DashboardOverview';
 import MyListings from './pages/dashboard/MyListings';
 import AddEditListing from './pages/dashboard/AddEditListing';
 import ProfileSettings from './pages/dashboard/ProfileSettings';
 
-// User Area Pages
 import UserLayout from './components/user/UserLayout';
 import UserDashboard from './pages/user/UserDashboard';
 import UserProfile from './pages/user/UserProfile';
 import UserProperties from './pages/user/UserProperties';
-
-// Admin Components
-import ProtectedRoute from './components/admin/ProtectedRoute';
-import AdminLayout from './components/admin/AdminLayout';
-import AdminLoginPage from './pages/admin/AdminLoginPage';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import UserManagement from './pages/admin/UserManagement';
-import PropertyManagement from './pages/admin/PropertyManagement';
-import PremiumManagement from './pages/admin/PremiumManagement';
-import CategoryManagement from './pages/admin/CategoryManagement';
-import LocationManagement from './pages/admin/LocationManagement';
-import ReportsManagement from './pages/admin/ReportsManagement';
-import ModerationHistory from './pages/admin/ModerationHistory';
-import Analytics from './pages/admin/Analytics';
-import Settings from './pages/admin/Settings';
-import UnauthorizedPage from './pages/admin/UnauthorizedPage';
+import UserFavorites from './pages/user/UserFavorites';
+import { supabase } from './lib/supabase';
 
 function App() {
+  useEffect(() => {
+    const testSupabaseConnection = async () => {
+      try {
+        // Attempt to fetch a small amount of data from a public table
+        // Replace 'listings' with any table you know exists and is accessible
+        const { data, error } = await supabase.from('listings').select('id').limit(1);
+        if (error) {
+          console.error('Supabase connection test failed:', error);
+        } else {
+          console.log('Supabase connection test successful:', data);
+        }
+      } catch (err) {
+        console.error('Supabase connection test caught an exception:', err);
+      }
+    };
+    testSupabaseConnection();
+  }, []);
+  
   return (
     <HelmetProvider>
       <AuthProvider>
@@ -87,9 +87,7 @@ function App() {
 
               {/* User Dashboard Routes */}
               <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <DashboardLayout />
-                </ProtectedRoute>
+                <DashboardLayout />
               }>
                 <Route index element={<DashboardOverview />} />
                 <Route path="listings" element={<MyListings />} />
@@ -101,34 +99,12 @@ function App() {
 
               {/* User Area Routes */}
               <Route path="/user" element={
-                <ProtectedRoute>
-                  <UserLayout />
-                </ProtectedRoute>
+                <UserLayout />
               }>
                 <Route path="dashboard" element={<UserDashboard />} />
                 <Route path="profile" element={<UserProfile />} />
                 <Route path="properties" element={<UserProperties />} />
-              </Route>
-
-              {/* Admin Routes */}
-              <Route path="/admin/login" element={<AdminLoginPage />} />
-              <Route path="/admin/unauthorized" element={<UnauthorizedPage />} />
-              
-              <Route path="/admin" element={
-                <ProtectedRoute requireAdmin>
-                  <AdminLayout />
-                </ProtectedRoute>
-              }>
-                <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="users" element={<UserManagement />} />
-                <Route path="properties" element={<PropertyManagement />} />
-                <Route path="premium" element={<PremiumManagement />} />
-                <Route path="categories" element={<CategoryManagement />} />
-                <Route path="locations" element={<LocationManagement />} />
-                <Route path="reports" element={<ReportsManagement />} />
-                <Route path="moderation-history" element={<ModerationHistory />} />
-                <Route path="analytics" element={<Analytics />} />
-                <Route path="settings" element={<Settings />} />
+                <Route path="favorites" element={<UserFavorites />} />
               </Route>
             </Routes>
           </Router>
