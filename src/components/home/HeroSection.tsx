@@ -33,7 +33,7 @@ const HeroSection: React.FC = () => {
       // Get total active/available properties count
       const { count: propertiesCount, error: propertiesError } = await supabase
         .from('listings')
-        .select('*', { count: 'exact', head: true });
+        .select('*', { count: 'exact', head: true })
         .in('status', activeListingStatuses);
       if (propertiesError) throw propertiesError; // ADDED: Error check
 
