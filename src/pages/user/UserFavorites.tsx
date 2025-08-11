@@ -159,13 +159,13 @@ const UserFavorites: React.FC = () => {
                     <div className="p-4">
                       <div className="mb-2">
                         <span className="text-xs text-neutral-500 uppercase">
-                          {favorite.property.type === 'rumah' ? 'House' : 
-                           favorite.property.type === 'apartemen' ? 'Apartment' : 
-                           favorite.property.type === 'kondominium' ? 'Condominium' : 
+                          {favorite.property.type === 'rumah' ? 'Rumah' : 
+                           favorite.property.type === 'apartemen' ? 'Apartemen' : 
+                           favorite.property.type === 'kondominium' ? 'Kondominium' : 
                            favorite.property.type === 'ruko' ? 'Ruko' : 
-                           favorite.property.type === 'tanah' ? 'Land' : 
-                           favorite.property.type === 'gedung_komersial' ? 'Commercial' : 
-                           favorite.property.type === 'ruang_industri' ? 'Industrial' : 'Property'}
+                           favorite.property.type === 'tanah' ? 'Tanah' : 
+                           favorite.property.type === 'gedung_komersial' ? 'Gedung Komersial' : 
+                           favorite.property.type === 'ruang_industri' ? 'Ruang Industri' : 'Properti'}
                         </span>
                       </div>
                       
