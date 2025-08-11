@@ -93,6 +93,7 @@ const PropertyDetailPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null); // ADD THIS LINE
   const [isFavorited, setIsFavorited] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
   
   useEffect(() => {
     if (id) {
@@ -171,6 +172,182 @@ const PropertyDetailPage: React.FC = () => {
       );
     } finally {
       setIsToggling(false);
+    }
+  };
+
+  const handleShare = async () => {
+    if (!property) {
+      showError('Error', 'Property information not available for sharing.');
+      return;
+    }
+
+    setIsSharing(true);
+
+    try {
+      const shareData = {
+        title: property.title,
+        text: `Check out this ${property.type} in ${property.location.city} - ${formatPrice(property.price, property.priceUnit)}`,
+        url: window.location.href
+      };
+
+      // Check if native sharing is available (mobile devices, some desktop browsers)
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+        showSuccess(
+          'Shared Successfully',
+          'Property has been shared successfully.'
+        );
+      } else {
+        // Fallback: Copy URL to clipboard
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(window.location.href);
+          showSuccess(
+            'Link Copied',
+            'Property link has been copied to your clipboard.'
+          );
+        } else {
+          // Fallback for older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = window.location.href;
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-999999px';
+          textArea.style.top = '-999999px';
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          
+          try {
+            document.execCommand('copy');
+            showSuccess(
+              'Link Copied',
+              'Property link has been copied to your clipboard.'
+            );
+          } catch (err) {
+            showError(
+              'Share Failed',
+              'Unable to share or copy the link. Please manually copy the URL from your browser.'
+            );
+          } finally {
+            document.body.removeChild(textArea);
+          }
+        }
+      }
+    } catch (error: any) {
+      console.error('Error sharing property:', error);
+      
+      // Handle specific share cancellation (user cancelled the share dialog)
+      if (error.name === 'AbortError') {
+        // User cancelled sharing, don't show error message
+        return;
+      }
+      
+      showError(
+        'Share Failed',
+        error.message || 'Failed to share property. Please try again.'
+      );
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
+  const handlePrint = () => {
+    if (!property) {
+      showError('Error', 'Property information not available for printing.');
+      return;
+    }
+
+    try {
+      // Add print-specific styles to hide unnecessary elements
+      const printStyles = document.createElement('style');
+      printStyles.textContent = `
+        @media print {
+          /* Hide navigation, footer, and action buttons */
+          header, footer, .no-print {
+            display: none !important;
+          }
+          
+          /* Ensure property images print well */
+          .property-image {
+            max-height: 300px !important;
+            page-break-inside: avoid;
+          }
+          
+          /* Optimize text for printing */
+          body {
+            font-size: 12pt;
+            line-height: 1.4;
+            color: black !important;
+            background: white !important;
+          }
+          
+          /* Ensure proper page breaks */
+          .property-section {
+            page-break-inside: avoid;
+            margin-bottom: 20px;
+          }
+          
+          /* Hide interactive elements */
+          button, .btn-primary, .btn-secondary {
+            display: none !important;
+          }
+          
+          /* Show print-specific content */
+          .print-only {
+            display: block !important;
+          }
+          
+          /* Optimize map for printing */
+          .map-container {
+            height: 200px !important;
+          }
+        }
+        
+        .print-only {
+          display: none;
+        }
+      `;
+      
+      document.head.appendChild(printStyles);
+      
+      // Add print-specific content
+      const printInfo = document.createElement('div');
+      printInfo.className = 'print-only';
+      printInfo.innerHTML = `
+        <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc;">
+          <h3>Property Details - Printed from Properti Pro</h3>
+          <p>URL: ${window.location.href}</p>
+          <p>Printed on: ${new Date().toLocaleDateString('id-ID', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })}</p>
+          <p>Contact: info@propertipro.id | +62 21 1234 5678</p>
+        </div>
+      `;
+      
+      document.body.insertBefore(printInfo, document.body.firstChild);
+      
+      // Trigger print dialog
+      window.print();
+      
+      // Clean up after printing
+      setTimeout(() => {
+        document.head.removeChild(printStyles);
+        document.body.removeChild(printInfo);
+      }, 1000);
+      
+      showSuccess(
+        'Print Dialog Opened',
+        'Print dialog has been opened. You can now print or save as PDF.'
+      );
+    } catch (error: any) {
+      console.error('Error printing property:', error);
+      showError(
+        'Print Failed',
+        error.message || 'Failed to open print dialog. Please try again.'
+      );
     }
   };
 
@@ -392,10 +569,29 @@ const PropertyDetailPage: React.FC = () => {
                     <Heart size={18} className={isFavorited ? 'fill-current' : ''} />
                   )}
                 </button>
-                <button className="p-2 rounded-full bg-neutral-100 hover:bg-neutral-200 transition-colors" aria-label="Bagikan properti">
-                  <Share2 size={18} />
+                <button 
+                  onClick={handleShare}
+                  disabled={isSharing}
+                  className={`p-2 rounded-full transition-colors duration-300 ${
+                    isSharing 
+                      ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed' 
+                      : 'bg-neutral-100 text-neutral-600 hover:bg-blue-500 hover:text-white'
+                  }`}
+                  aria-label="Share property"
+                  title="Share this property"
+                >
+                  {isSharing ? (
+                    <Loader size={18} className="animate-spin" />
+                  ) : (
+                    <Share2 size={18} />
+                  )}
                 </button>
-                <button className="p-2 rounded-full bg-neutral-100 hover:bg-neutral-200 transition-colors" aria-label="Cetak properti">
+                <button 
+                  onClick={handlePrint}
+                  className="p-2 rounded-full bg-neutral-100 text-neutral-600 hover:bg-green-500 hover:text-white transition-colors duration-300"
+                  aria-label="Print property details"
+                  title="Print this property"
+                >
                   <Printer size={18} />
                 </button>
               </div>
