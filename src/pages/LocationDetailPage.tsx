@@ -337,7 +337,7 @@ const LocationDetailPage: React.FC = () => {
                       <option value="rumah">House</option>
                       <option value="apartemen">Apartment</option>
                       <option value="kondominium">Condominium</option>
-                      <option value="ruko">Shop House</option>
+                      <option value="ruko">Ruko</option>
                       <option value="tanah">Land</option>
                       <option value="gedung_komersial">Commercial Building</option>
                       <option value="ruang_industri">Industrial Space</option>
