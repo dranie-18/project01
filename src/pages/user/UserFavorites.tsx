@@ -162,7 +162,7 @@ const UserFavorites: React.FC = () => {
                           {favorite.property.type === 'rumah' ? 'House' : 
                            favorite.property.type === 'apartemen' ? 'Apartment' : 
                            favorite.property.type === 'kondominium' ? 'Condominium' : 
-                           favorite.property.type === 'ruko' ? 'Shop House' : 
+                           favorite.property.type === 'ruko' ? 'Ruko' : 
                            favorite.property.type === 'tanah' ? 'Land' : 
                            favorite.property.type === 'gedung_komersial' ? 'Commercial' : 
                            favorite.property.type === 'ruang_industri' ? 'Industrial' : 'Property'}
