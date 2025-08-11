@@ -376,9 +376,6 @@ const PropertyDetailPage: React.FC = () => {
                 </span>
               </div>
               <div className="flex gap-2 ml-auto">
-                <button className="p-2 rounded-full bg-neutral-100 hover:bg-neutral-200 transition-colors" aria-label="Simpan properti">
-                  <Heart size={18} />
-                </button>
                 <button 
                   onClick={handleFavoriteClick}
                   disabled={isToggling}
