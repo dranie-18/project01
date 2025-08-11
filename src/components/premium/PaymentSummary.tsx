@@ -33,7 +33,7 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({
   
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
-      <h3 className="text-lg font-semibold text-neutral-800 mb-4">Payment Summary</h3>
+      <h3 className="text-lg font-semibold text-neutral-800 mb-4">Ringkasan Pembayaran</h3>
       
       <div className="space-y-4">
         <div className="flex items-start justify-between">
@@ -41,7 +41,7 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({
             <Calendar size={20} className="text-yellow-600 mr-3" />
             <div>
               <div className="font-medium">{plan.name}</div>
-              <div className="text-sm text-neutral-500">{plan.duration} days</div>
+              <div className="text-sm text-neutral-500">{plan.duration} hari</div>
             </div>
           </div>
           <div className="text-lg font-bold">${plan.price}</div>
@@ -51,9 +51,9 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({
           <div className="flex items-center">
             <CreditCard size={20} className="text-neutral-500 mr-3" />
             <div>
-              <div className="font-medium">Payment Method</div>
+              <div className="font-medium">Metode Pembayaran</div>
               <div className="text-sm text-neutral-500">
-                {selectedMethod ? getMethodName(selectedMethod) : 'Not selected'}
+                {selectedMethod ? getMethodName(selectedMethod) : 'Belum dipilih'}
                 {selectedChannel && ` - ${selectedChannel}`}
               </div>
             </div>
@@ -69,7 +69,7 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({
         
         <div className="pt-4 flex items-center text-sm text-neutral-500">
           <Shield size={16} className="mr-2" />
-          <span>Secure payment processed by Xendit</span>
+          <span>Pembayaran aman diproses oleh Xendit</span>
         </div>
       </div>
     </div>

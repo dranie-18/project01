@@ -43,6 +43,23 @@ const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
         return <CreditCard size={24} />;
     }
   };
+
+  const getMethodName = (method: XenditPaymentMethod | null): string => {
+    switch (method) {
+      case 'credit_card':
+        return 'Kartu Kredit/Debit';
+      case 'virtual_account':
+        return 'Virtual Account';
+      case 'e_wallet':
+        return 'E-Wallet';
+      case 'retail_outlet':
+        return 'Outlet Retail';
+      case 'qr_code':
+        return 'Kode QR';
+      default:
+        return 'Belum dipilih';
+    }
+  };
   
   const handleMethodClick = (methodId: XenditPaymentMethod) => {
     const method = paymentMethods.find(m => m.id === methodId);
@@ -69,7 +86,7 @@ const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
   
   return (
     <div className="space-y-4">
-      <h3 className="font-semibold text-lg mb-2">Select Payment Method</h3>
+      <h3 className="font-semibold text-lg mb-2">Pilih Metode Pembayaran</h3>
       
       <div className="space-y-2">
         {paymentMethods.map((method) => (

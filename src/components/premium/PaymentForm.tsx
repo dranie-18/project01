@@ -170,12 +170,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold mb-2">Complete Your Payment</h2>
-            <p className="text-yellow-100">Secure payment powered by Xendit</p>
+            <h2 className="text-2xl font-bold mb-2">Selesaikan Pembayaran Anda</h2>
+            <p className="text-yellow-100">Pembayaran aman didukung oleh Xendit</p>
           </div>
           <div className="text-right">
             <div className="text-3xl font-bold">${amount}</div>
-            <div className="text-yellow-100">Premium Listing</div>
+            <div className="text-yellow-100">Iklan Premium</div>
           </div>
         </div>
       </div>
@@ -185,9 +185,9 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         <div className="flex items-center">
           <Lock size={20} className="text-green-600 mr-3" />
           <div>
-            <h3 className="font-semibold text-green-800">Secure Payment</h3>
+            <h3 className="font-semibold text-green-800">Pembayaran Aman</h3>
             <p className="text-green-700 text-sm">
-              Your payment information is encrypted and secure. We use industry-standard SSL encryption.
+              Informasi pembayaran Anda dienkripsi dan aman. Kami menggunakan enkripsi SSL standar industri.
             </p>
           </div>
         </div>
@@ -200,13 +200,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           <div className="md:col-span-2">
             <h3 className="text-lg font-semibold text-neutral-800 mb-4 flex items-center">
               <User size={20} className="mr-2" />
-              Personal Information
+              Informasi Pribadi
             </h3>
           </div>
 
           <div>
             <label htmlFor="firstName" className="block text-sm font-medium text-neutral-700 mb-1">
-              First Name *
+              Nama Depan *
             </label>
             <input
               type="text"
@@ -216,7 +216,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               }`}
               value={billingDetails.firstName}
               onChange={(e) => handleInputChange('firstName', e.target.value)}
-              placeholder="Enter your first name"
+              placeholder="Masukkan nama depan Anda"
               required
               aria-describedby={errors.firstName ? "firstName-error" : undefined}
               aria-invalid={errors.firstName ? "true" : "false"}
@@ -228,7 +228,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
           <div>
             <label htmlFor="lastName" className="block text-sm font-medium text-neutral-700 mb-1">
-              Last Name *
+              Nama Belakang *
             </label>
             <input
               type="text"
@@ -238,7 +238,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               }`}
               value={billingDetails.lastName}
               onChange={(e) => handleInputChange('lastName', e.target.value)}
-              placeholder="Enter your last name"
+              placeholder="Masukkan nama belakang Anda"
               required
               aria-describedby={errors.lastName ? "lastName-error" : undefined}
               aria-invalid={errors.lastName ? "true" : "false"}
@@ -250,7 +250,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-1">
-              Email Address *
+              Alamat Email *
             </label>
             <div className="relative">
               <Mail size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500" />
@@ -262,7 +262,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                 }`}
                 value={billingDetails.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                placeholder="Enter your email"
+                placeholder="Masukkan email Anda"
                 required
                 aria-describedby={errors.email ? "email-error" : undefined}
                 aria-invalid={errors.email ? "true" : "false"}
@@ -275,7 +275,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
           <div>
             <label htmlFor="phone" className="block text-sm font-medium text-neutral-700 mb-1">
-              Phone Number *
+              Nomor Telepon *
             </label>
             <div className="relative">
               <Phone size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500" />
@@ -302,13 +302,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           <div className="md:col-span-2 mt-6">
             <h3 className="text-lg font-semibold text-neutral-800 mb-4 flex items-center">
               <MapPin size={20} className="mr-2" />
-              Billing Address
+              Alamat Penagihan
             </h3>
           </div>
 
           <div className="md:col-span-2">
             <label htmlFor="address" className="block text-sm font-medium text-neutral-700 mb-1">
-              Street Address *
+              Alamat Jalan *
             </label>
             <input
               type="text"
@@ -318,7 +318,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               }`}
               value={billingDetails.address}
               onChange={(e) => handleInputChange('address', e.target.value)}
-              placeholder="Enter your street address"
+              placeholder="Masukkan alamat jalan Anda"
               required
               aria-describedby={errors.address ? "address-error" : undefined}
               aria-invalid={errors.address ? "true" : "false"}
@@ -330,7 +330,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
           <div>
             <label htmlFor="city" className="block text-sm font-medium text-neutral-700 mb-1">
-              City *
+              Kota *
             </label>
             <input
               type="text"
@@ -340,7 +340,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               }`}
               value={billingDetails.city}
               onChange={(e) => handleInputChange('city', e.target.value)}
-              placeholder="Enter your city"
+              placeholder="Masukkan kota Anda"
               required
               aria-describedby={errors.city ? "city-error" : undefined}
               aria-invalid={errors.city ? "true" : "false"}
@@ -352,7 +352,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
           <div>
             <label htmlFor="postalCode" className="block text-sm font-medium text-neutral-700 mb-1">
-              Postal Code *
+              Kode Pos *
             </label>
             <input
               type="text"
@@ -374,7 +374,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
           <div>
             <label htmlFor="country" className="block text-sm font-medium text-neutral-700 mb-1">
-              Country
+              Negara
             </label>
             <select
               id="country"
@@ -395,13 +395,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               <div className="md:col-span-2 mt-6">
                 <h3 className="text-lg font-semibold text-neutral-800 mb-4 flex items-center">
                   <CreditCard size={20} className="mr-2" />
-                  Card Information
+                  Informasi Kartu
                 </h3>
               </div>
               
               <div className="md:col-span-2">
                 <label htmlFor="cardNumber" className="block text-sm font-medium text-neutral-700 mb-1">
-                  Card Number *
+                  Nomor Kartu *
                 </label>
                 <div className="relative">
                   <CreditCardIcon size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500" />
@@ -427,7 +427,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               
               <div>
                 <label htmlFor="cardExpiry" className="block text-sm font-medium text-neutral-700 mb-1">
-                  Expiry Date *
+                  Tanggal Kedaluwarsa *
                 </label>
                 <div className="relative">
                   <Calendar size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500" />
@@ -453,7 +453,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               
               <div>
                 <label htmlFor="cardCvv" className="block text-sm font-medium text-neutral-700 mb-1">
-                  CVV *
+                  Kode CVV *
                 </label>
                 <input
                   type="text"
@@ -476,7 +476,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               
               <div className="md:col-span-2">
                 <label htmlFor="cardName" className="block text-sm font-medium text-neutral-700 mb-1">
-                  Name on Card *
+                  Nama di Kartu *
                 </label>
                 <input
                   type="text"
@@ -486,7 +486,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                   }`}
                   value={cardName}
                   onChange={(e) => setCardName(e.target.value)}
-                  placeholder="Enter name as it appears on card"
+                  placeholder="Masukkan nama seperti yang tertera di kartu"
                   required
                   aria-describedby={cardErrors.cardName ? "cardName-error" : undefined}
                   aria-invalid={cardErrors.cardName ? "true" : "false"}
@@ -502,12 +502,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           {paymentMethod && paymentMethod !== 'credit_card' && (
             <div className="md:col-span-2 mt-4">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="font-semibold text-blue-800 mb-2">Payment Instructions</h3>
+                <h3 className="font-semibold text-blue-800 mb-2">Instruksi Pembayaran</h3>
                 <p className="text-blue-700 text-sm">
-                  {paymentMethod === 'virtual_account' && 'You will receive virtual account details to complete your payment after submitting this form.'}
-                  {paymentMethod === 'e_wallet' && 'You will be redirected to complete your payment using your e-wallet after submitting this form.'}
-                  {paymentMethod === 'retail_outlet' && 'You will receive a payment code to complete your payment at a retail outlet after submitting this form.'}
-                  {paymentMethod === 'qr_code' && 'You will receive a QR code to scan and complete your payment after submitting this form.'}
+                  {paymentMethod === 'virtual_account' && 'Anda akan menerima detail virtual account untuk menyelesaikan pembayaran setelah mengirim formulir ini.'}
+                  {paymentMethod === 'e_wallet' && 'Anda akan diarahkan untuk menyelesaikan pembayaran menggunakan e-wallet setelah mengirim formulir ini.'}
+                  {paymentMethod === 'retail_outlet' && 'Anda akan menerima kode pembayaran untuk menyelesaikan pembayaran di outlet retail setelah mengirim formulir ini.'}
+                  {paymentMethod === 'qr_code' && 'Anda akan menerima kode QR untuk dipindai dan menyelesaikan pembayaran setelah mengirim formulir ini.'}
                 </p>
               </div>
             </div>
@@ -527,17 +527,17 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             ) : (
               <CreditCard size={20} className="mr-3" />
             )}
-            {isLoading ? 'Processing...' : `Pay $${amount} Now`}
+            {isLoading ? 'Memproses...' : `Bayar $${amount} Sekarang`}
           </button>
         </div>
 
         {/* Security Footer */}
         <div className="mt-6 text-center text-sm text-neutral-500">
           <p>
-            By proceeding, you agree to our{' '}
-            <a href="#" className="text-yellow-600 hover:underline">Terms of Service</a>
-            {' '}and{' '}
-            <a href="#" className="text-yellow-600 hover:underline">Privacy Policy</a>
+            Dengan melanjutkan, Anda menyetujui{' '}
+            <a href="#" className="text-yellow-600 hover:underline">Syarat Layanan</a>
+            {' '}dan{' '}
+            <a href="#" className="text-yellow-600 hover:underline">Kebijakan Privasi</a>
           </p>
         </div>
       </form>
