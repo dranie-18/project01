@@ -334,14 +334,14 @@ const LocationDetailPage: React.FC = () => {
                       onChange={(e) => setPropertyType(e.target.value)}
                     >
                       <option value="">All Types</option>
-                      <option value="rumah">House</option>
-                      <option value="apartemen">Apartment</option>
-                      <option value="kondominium">Condominium</option>
+                      <option value="rumah">Rumah</option>
+                      <option value="apartemen">Apartemen</option>
+                      <option value="kondominium">Kondominium</option>
                       <option value="ruko">Ruko</option>
-                      <option value="tanah">Land</option>
-                      <option value="gedung_komersial">Commercial Building</option>
-                      <option value="ruang_industri">Industrial Space</option>
-                      <option value="lainnya">Other</option>
+                      <option value="tanah">Tanah</option>
+                      <option value="gedung_komersial">Gedung Komersial</option>
+                      <option value="ruang_industri">Ruang Industri</option>
+                      <option value="lainnya">Properti</option>
                     </select>
                   </div>
                   
