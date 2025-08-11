@@ -11,6 +11,9 @@ interface Stats {
 }
 
 const HeroSection: React.FC = () => {
+  // Define which listing statuses should be considered "available"
+  const activeListingStatuses = ['active', 'pending'];
+  
   const [stats, setStats] = useState<Stats>({
     totalProperties: 0,
     totalPropertiesForSale: 0,
@@ -27,27 +30,30 @@ const HeroSection: React.FC = () => {
   const fetchStats = async () => {
     setIsLoading(true);
     try {
-      // Get total properties count
+      // Get total active/available properties count
       const { count: propertiesCount, error: propertiesError } = await supabase
         .from('listings')
         .select('*', { count: 'exact', head: true });
+        .in('status', activeListingStatuses);
       if (propertiesError) throw propertiesError; // ADDED: Error check
 
-      // Get total properties for sale count
+      // Get total active properties for sale count
       const { count: propertiesforsaleCount, error: forSaleError } = await supabase
         .from('listings')
         .select('*', { count: 'exact', head: true })
-        .eq('purpose', 'jual');
+        .eq('purpose', 'jual')
+        .in('status', activeListingStatuses);
       if (forSaleError) throw forSaleError; // ADDED: Error check
       
-      // Get total properties for rent count
+      // Get total active properties for rent count
       const { count: propertiesforrentCount, error: forRentError } = await supabase
         .from('listings')
         .select('*', { count: 'exact', head: true })
-        .eq('purpose', 'sewa');
+        .eq('purpose', 'sewa')
+        .in('status', activeListingStatuses);
       if (forRentError) throw forRentError; // ADDED: Error check
       
-      // Get total users count
+      // Get total active users count (only active users)
       const { count: usersCount, error: usersError } = await supabase
         .from('user_profiles')
         .select('*', { count: 'exact', head: true })
