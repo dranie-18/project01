@@ -224,13 +224,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
       <div className="p-4">
         <div className="mb-2">
           <span className="text-xs text-neutral-500 uppercase">
-            {type === 'rumah' ? 'House' : 
-             type === 'apartemen' ? 'Apartment' : 
-             type === 'kondominium' ? 'Condominium' : 
+            {type === 'rumah' ? 'Rumah' : 
+             type === 'apartemen' ? 'Apartemen' : 
+             type === 'kondominium' ? 'Kondominium' : 
              type === 'ruko' ? 'Ruko' : 
-             type === 'tanah' ? 'Land' : 
-             type === 'gedung_komersial' ? 'Commercial' : 
-             type === 'ruang_industri' ? 'Industrial' : 'Property'}
+             type === 'tanah' ? 'Tanah' : 
+             type === 'gedung_komersial' ? 'Gedung Komersial' : 
+             type === 'ruang_industri' ? 'Ruang Industri' : 'Properti'}
           </span>
         </div>
         <h3 className="font-heading font-semibold text-lg mb-1 line-clamp-2 h-14">
