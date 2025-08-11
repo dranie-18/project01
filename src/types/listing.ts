@@ -240,69 +240,69 @@ export interface FeatureCategory {
  */
 export const PROPERTY_FEATURES: FeatureCategory[] = [
   {
-    name: 'Parking',
+    name: 'Parkir',
     features: [
-      { id: 'garage', label: 'Garage' },
+      { id: 'garage', label: 'Garasi' },
       { id: 'carport', label: 'Carport' },
-      { id: 'street_parking', label: 'Street Parking' }
+      { id: 'street_parking', label: 'Parkir Jalan' }
     ]
   },
   {
-    name: 'Outdoor Spaces',
+    name: 'Area Luar Ruangan',
     features: [
-      { id: 'garden', label: 'Garden' },
+      { id: 'garden', label: 'Taman' },
       { id: 'patio', label: 'Patio' },
-      { id: 'balcony', label: 'Balcony' },
-      { id: 'swimming_pool', label: 'Swimming Pool' }
+      { id: 'balcony', label: 'Balkon' },
+      { id: 'swimming_pool', label: 'Kolam Renang' }
     ]
   },
   {
-    name: 'Security',
+    name: 'Keamanan',
     features: [
       { id: 'cctv', label: 'CCTV' },
-      { id: 'gated_community', label: 'Gated Community' },
-      { id: 'security_system', label: 'Security System' }
+      { id: 'gated_community', label: 'Komunitas Berpagar' },
+      { id: 'security_system', label: 'Sistem Keamanan' }
     ]
   },
   {
-    name: 'Interior Amenities',
+    name: 'Fasilitas Interior',
     features: [
-      { id: 'air_conditioning', label: 'Air Conditioning' },
-      { id: 'built_in_wardrobes', label: 'Built-in Wardrobes' },
-      { id: 'storage', label: 'Storage' }
+      { id: 'air_conditioning', label: 'AC' },
+      { id: 'built_in_wardrobes', label: 'Lemari Pakaian Tanam' },
+      { id: 'storage', label: 'Penyimpanan' }
     ]
   },
   {
-    name: 'Kitchen Features',
+    name: 'Fitur Dapur',
     features: [
-      { id: 'modern_appliances', label: 'Modern Appliances' },
-      { id: 'kitchen_island', label: 'Kitchen Island' },
+      { id: 'modern_appliances', label: 'Peralatan Modern' },
+      { id: 'kitchen_island', label: 'Pulau Dapur' },
       { id: 'pantry', label: 'Pantry' }
     ]
   },
   {
-    name: 'Additional Rooms',
+    name: 'Ruangan Tambahan',
     features: [
-      { id: 'study', label: 'Study' },
-      { id: 'home_office', label: 'Home Office' },
-      { id: 'entertainment_room', label: 'Entertainment Room' }
+      { id: 'study', label: 'Ruang Belajar' },
+      { id: 'home_office', label: 'Kantor Rumah' },
+      { id: 'entertainment_room', label: 'Ruang Hiburan' }
     ]
   },
   {
-    name: 'Utilities',
+    name: 'Utilitas',
     features: [
-      { id: 'solar_panels', label: 'Solar Panels' },
-      { id: 'water_tank', label: 'Water Tank' },
-      { id: 'backup_generator', label: 'Backup Generator' }
+      { id: 'solar_panels', label: 'Panel Surya' },
+      { id: 'water_tank', label: 'Tangki Air' },
+      { id: 'backup_generator', label: 'Generator Cadangan' }
     ]
   },
   {
-    name: 'Layout Options',
+    name: 'Opsi Tata Letak',
     features: [
-      { id: 'open_floor_plan', label: 'Open Floor Plan' },
-      { id: 'separate_dining', label: 'Separate Dining Room' },
-      { id: 'master_bedroom_downstairs', label: 'Master Bedroom Downstairs' },
-      { id: 'modern_kitchen', label: 'Modern Kitchen' }
+      { id: 'open_floor_plan', label: 'Denah Lantai Terbuka' },
+      { id: 'separate_dining', label: 'Ruang Makan Terpisah' },
+      { id: 'master_bedroom_downstairs', label: 'Kamar Tidur Utama di Bawah' },
+      { id: 'modern_kitchen', label: 'Dapur Modern' }
     ]
   }
 ];

@@ -449,13 +449,13 @@ const PropertyListingPage: React.FC = () => {
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="font-semibold text-lg flex items-center">
                     <Filter size={18} className="mr-2" />
-                    Filters
+                    Filter
                   </h2>
                   <button
                     onClick={resetFilters}
                     className="text-sm text-primary hover:underline"
                   >
-                    Reset All
+                    Reset Semua
                   </button>
                 </div>
                 
@@ -463,12 +463,12 @@ const PropertyListingPage: React.FC = () => {
                 <div className="mb-4">
                   <h3 className="font-medium text-neutral-800 mb-2 flex items-center">
                     <DollarSign size={16} className="mr-1" />
-                    Price Range
+                    Rentang Harga
                   </h3>
                   <div className="flex items-center space-x-2">
                     <input
                       type="number"
-                      placeholder="Min"
+                      placeholder="Minimum"
                       className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary"
                       value={localFilters.minPrice}
                       onChange={(e) => setLocalFilters(prev => ({ ...prev, minPrice: e.target.value }))}
@@ -476,7 +476,7 @@ const PropertyListingPage: React.FC = () => {
                     <span>-</span>
                     <input
                       type="number"
-                      placeholder="Max"
+                      placeholder="Maksimum"
                       className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary"
                       value={localFilters.maxPrice}
                       onChange={(e) => setLocalFilters(prev => ({ ...prev, maxPrice: e.target.value }))}
@@ -488,7 +488,7 @@ const PropertyListingPage: React.FC = () => {
                 <div className="mb-4">
                   <h3 className="font-medium text-neutral-800 mb-2 flex items-center">
                     <Bed size={16} className="mr-1" />
-                    Bedrooms
+                    Kamar Tidur
                   </h3>
                   <div className="flex items-center space-x-2">
                     <select
@@ -496,7 +496,7 @@ const PropertyListingPage: React.FC = () => {
                       value={localFilters.minBedrooms}
                       onChange={(e) => setLocalFilters(prev => ({ ...prev, minBedrooms: e.target.value }))}
                     >
-                      <option value="">Min</option>
+                      <option value="">Minimum</option>
                       <option value="1">1</option>
                       <option value="2">2</option>
                       <option value="3">3</option>
@@ -514,7 +514,7 @@ const PropertyListingPage: React.FC = () => {
                       value={localFilters.maxBedrooms}
                       onChange={(e) => setLocalFilters(prev => ({ ...prev, maxBedrooms: e.target.value }))}
                     >
-                      <option value="">Max</option>
+                      <option value="">Maksimum</option>
                       <option value="1">1</option>
                       <option value="2">2</option>
                       <option value="3">3</option>
@@ -533,7 +533,7 @@ const PropertyListingPage: React.FC = () => {
                 <div className="mb-4">
                   <h3 className="font-medium text-neutral-800 mb-2 flex items-center">
                     <Bath size={16} className="mr-1" />
-                    Bathrooms
+                    Kamar Mandi
                   </h3>
                   <div className="flex items-center space-x-2">
                     <select
@@ -541,7 +541,7 @@ const PropertyListingPage: React.FC = () => {
                       value={localFilters.minBathrooms}
                       onChange={(e) => setLocalFilters(prev => ({ ...prev, minBathrooms: e.target.value }))}
                     >
-                      <option value="">Min</option>
+                      <option value="">Minimum</option>
                       <option value="1">1</option>
                       <option value="2">2</option>
                       <option value="3">3</option>
@@ -556,7 +556,7 @@ const PropertyListingPage: React.FC = () => {
                       value={localFilters.maxBathrooms}
                       onChange={(e) => setLocalFilters(prev => ({ ...prev, maxBathrooms: e.target.value }))}
                     >
-                      <option value="">Max</option>
+                      <option value="">Maksimum</option>
                       <option value="1">1</option>
                       <option value="2">2</option>
                       <option value="3">3</option>
@@ -572,7 +572,7 @@ const PropertyListingPage: React.FC = () => {
                 <div className="mb-4">
                   <h3 className="font-medium text-neutral-800 mb-2 flex items-center">
                     <Home size={16} className="mr-1" />
-                    Floors/Levels
+                    Jumlah Lantai
                   </h3>
                   <div className="flex items-center space-x-2">
                     <select
@@ -580,7 +580,7 @@ const PropertyListingPage: React.FC = () => {
                       value={localFilters.minFloors}
                       onChange={(e) => setLocalFilters(prev => ({ ...prev, minFloors: e.target.value }))}
                     >
-                      <option value="">Min</option>
+                      <option value="">Minimum</option>
                       <option value="1">1</option>
                       <option value="2">2</option>
                       <option value="3">3</option>
@@ -593,7 +593,7 @@ const PropertyListingPage: React.FC = () => {
                       value={localFilters.maxFloors}
                       onChange={(e) => setLocalFilters(prev => ({ ...prev, maxFloors: e.target.value }))}
                     >
-                      <option value="">Max</option>
+                      <option value="">Maksimum</option>
                       <option value="1">1</option>
                       <option value="2">2</option>
                       <option value="3">3</option>
@@ -607,12 +607,12 @@ const PropertyListingPage: React.FC = () => {
                 <div className="mb-4">
                   <h3 className="font-medium text-neutral-800 mb-2 flex items-center">
                     <Move size={16} className="mr-1" />
-                    Building Size (m²)
+                    Luas Bangunan (m²)
                   </h3>
                   <div className="flex items-center space-x-2">
                     <input
                       type="number"
-                      placeholder="Min"
+                      placeholder="Minimum"
                       className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary"
                       value={localFilters.minBuildingSize}
                       onChange={(e) => setLocalFilters(prev => ({ ...prev, minBuildingSize: e.target.value }))}
@@ -620,7 +620,7 @@ const PropertyListingPage: React.FC = () => {
                     <span>-</span>
                     <input
                       type="number"
-                      placeholder="Max"
+                      placeholder="Maksimum"
                       className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary"
                       value={localFilters.maxBuildingSize}
                       onChange={(e) => setLocalFilters(prev => ({ ...prev, maxBuildingSize: e.target.value }))}
@@ -632,12 +632,12 @@ const PropertyListingPage: React.FC = () => {
                 <div className="mb-4">
                   <h3 className="font-medium text-neutral-800 mb-2 flex items-center">
                     <Move size={16} className="mr-1" />
-                    Land Size (m²)
+                    Luas Tanah (m²)
                   </h3>
                   <div className="flex items-center space-x-2">
                     <input
                       type="number"
-                      placeholder="Min"
+                      placeholder="Minimum"
                       className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary"
                       value={localFilters.minLandSize}
                       onChange={(e) => setLocalFilters(prev => ({ ...prev, minLandSize: e.target.value }))}
@@ -645,7 +645,7 @@ const PropertyListingPage: React.FC = () => {
                     <span>-</span>
                     <input
                       type="number"
-                      placeholder="Max"
+                      placeholder="Maksimum"
                       className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary"
                       value={localFilters.maxLandSize}
                       onChange={(e) => setLocalFilters(prev => ({ ...prev, maxLandSize: e.target.value }))}
@@ -662,7 +662,7 @@ const PropertyListingPage: React.FC = () => {
                   >
                     <span className="flex items-center">
                       <Check size={16} className="mr-1" />
-                      Features & Amenities
+                      Fitur & Fasilitas
                     </span>
                     {showFeatures ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   </button>
@@ -699,7 +699,7 @@ const PropertyListingPage: React.FC = () => {
                   onClick={applyFilters}
                   className="w-full btn-primary py-2"
                 >
-                  Apply Filters
+                  Terapkan Filter
                 </button>
               </div>
             </div>
@@ -710,13 +710,13 @@ const PropertyListingPage: React.FC = () => {
                 <div className="flex justify-center py-12">
                   <div className="flex flex-col items-center">
                     <Loader size={40} className="animate-spin text-primary mb-4" /> {/* MODIFIED: Use Loader icon */}
-                    <p className="text-neutral-600">Loading properties...</p>
+                    <p className="text-neutral-600">Memuat properti...</p>
                   </div>
                 </div>
               ) : error ? ( // ADDED: Error display
                 <div className="bg-white rounded-lg shadow-md p-8 text-center">
                   <h3 className="font-heading font-semibold text-xl mb-2 text-red-600">
-                    Error Loading Properties
+                    Gagal Memuat Properti
                   </h3>
                   <p className="text-neutral-600 mb-4">
                     {error}
@@ -725,7 +725,7 @@ const PropertyListingPage: React.FC = () => {
                     onClick={fetchProperties} // MODIFIED: Retry fetching
                     className="btn-primary"
                   >
-                    Try Again
+                    Coba Lagi
                   </button>
                 </div>
               ) : properties.length > 0 ? (
