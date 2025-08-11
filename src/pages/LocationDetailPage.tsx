@@ -204,10 +204,10 @@ const LocationDetailPage: React.FC = () => {
   return (
     <Layout>
       <Helmet>
-        <title>{location ? `Properties in ${location.name}` : 'Loading...'} | Properti Pro</title>
+        <title>{location ? `Properti di ${location.name}` : 'Memuat...'} | Properti Pro</title>
         <meta 
           name="description" 
-          content={location ? `Discover properties in ${location.name}. Find houses, apartments, and more for sale or rent.` : 'Loading properties...'}
+          content={location ? `Temukan properti di ${location.name}. Temukan rumah, apartemen, dan lainnya untuk dijual atau disewa.` : 'Memuat properti...'}
         />
       </Helmet>
       
@@ -226,10 +226,10 @@ const LocationDetailPage: React.FC = () => {
                     </span>
                   </div>
                   <h1 className="font-heading font-bold text-3xl md:text-4xl text-accent mb-2">
-                    Properties in {location.name}
+                    Properti di {location.name}
                   </h1>
                   <p className="text-neutral-600">
-                    Discover {totalCount} properties available in {location.name}
+                    Temukan {totalCount} properti tersedia di {location.name}
                   </p>
                 </div>
               </div>
@@ -245,7 +245,7 @@ const LocationDetailPage: React.FC = () => {
                   className="flex items-center px-4 py-2 border border-neutral-300 rounded-lg hover:bg-neutral-50"
                 >
                   <Filter size={18} className="mr-2" />
-                  Filters
+                  Filter
                   {showFilters ? <ChevronUp size={16} className="ml-2" /> : <ChevronDown size={16} className="ml-2" />}
                 </button>
                 
@@ -260,28 +260,28 @@ const LocationDetailPage: React.FC = () => {
                       setSearchParams(params);
                     }}
                   >
-                    <option value="popularity">Most Popular</option>
-                    <option value="price_low">Price: Low to High</option>
-                    <option value="price_high">Price: High to Low</option>
-                    <option value="newest">Newest First</option>
+                    <option value="popularity">Paling Populer</option>
+                    <option value="price_low">Harga: Rendah ke Tinggi</option>
+                    <option value="price_high">Harga: Tinggi ke Rendah</option>
+                    <option value="newest">Terbaru</option>
                   </select>
                 </div>
               </div>
               
               <div className="flex items-center">
-                <span className="text-sm text-neutral-600 mr-2">View:</span>
+                <span className="text-sm text-neutral-600 mr-2">Tampilan:</span>
                 <div className="flex border rounded overflow-hidden">
                   <button 
                     className={`p-2 ${viewMode === 'grid' ? 'bg-primary text-white' : 'bg-white text-neutral-700'}`}
                     onClick={() => setViewMode('grid')}
-                    aria-label="Grid View"
+                    aria-label="Tampilan Grid"
                   >
                     <Grid size={16} />
                   </button>
                   <button 
                     className={`p-2 ${viewMode === 'list' ? 'bg-primary text-white' : 'bg-white text-neutral-700'}`}
                     onClick={() => setViewMode('list')}
-                    aria-label="List View"
+                    aria-label="Tampilan Daftar"
                   >
                     <ListIcon size={16} />
                   </button>
@@ -388,39 +388,39 @@ const LocationDetailPage: React.FC = () => {
           {(propertyType || bedrooms || priceRange[0] || priceRange[1]) && (
             <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-sm font-medium text-neutral-700">Active Filters:</span>
+                <span className="text-sm font-medium text-neutral-700">Filter Aktif:</span>
                 
                 {propertyType && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-primary/10 text-primary">
                     <Home size={14} className="mr-1" />
-                    {propertyType === 'rumah' ? 'House' : 
-                     propertyType === 'apartemen' ? 'Apartment' : 
-                     propertyType === 'kondominium' ? 'Condominium' : 
-                     propertyType === 'ruko' ? 'Shop House' : 
-                     propertyType === 'tanah' ? 'Land' : 
-                     propertyType === 'gedung_komersial' ? 'Commercial Building' : 
-                     propertyType === 'ruang_industri' ? 'Industrial Space' : 'Other'}
+                    {propertyType === 'rumah' ? 'Rumah' : 
+                     propertyType === 'apartemen' ? 'Apartemen' : 
+                     propertyType === 'kondominium' ? 'Kondominium' : 
+                     propertyType === 'ruko' ? 'Ruko' : 
+                     propertyType === 'tanah' ? 'Tanah' : 
+                     propertyType === 'gedung_komersial' ? 'Gedung Komersial' : 
+                     propertyType === 'ruang_industri' ? 'Ruang Industri' : 'Lainnya'}
                   </span>
                 )}
                 
                 {bedrooms && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-primary/10 text-primary">
                     <Bed size={14} className="mr-1" />
-                    {bedrooms}+ Bedrooms
+                    {bedrooms}+ Kamar Tidur
                   </span>
                 )}
                 
                 {priceRange[0] && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-primary/10 text-primary">
                     <DollarSign size={14} className="mr-1" />
-                    Min: {priceRange[0]}
+                    Minimum: {priceRange[0]}
                   </span>
                 )}
                 
                 {priceRange[1] && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-primary/10 text-primary">
                     <DollarSign size={14} className="mr-1" />
-                    Max: {priceRange[1]}
+                    Maksimum: {priceRange[1]}
                   </span>
                 )}
               </div>
@@ -432,7 +432,7 @@ const LocationDetailPage: React.FC = () => {
             <div className="flex justify-center py-12">
               <div className="flex flex-col items-center">
                 <Loader size={40} className="animate-spin text-primary mb-4" />
-                <p className="text-neutral-600">Loading properties in {location?.name || ''}...</p>
+                <p className="text-neutral-600">Memuat properti di {location?.name || ''}...</p>
               </div>
             </div>
           ) : properties.length > 0 ? (
@@ -479,16 +479,16 @@ const LocationDetailPage: React.FC = () => {
                 <Home size={32} className="text-neutral-400" />
               </div>
               <h3 className="text-lg font-semibold text-neutral-900 mb-2">
-                No properties found
+                Tidak ada properti ditemukan
               </h3>
               <p className="text-neutral-600 mb-4">
-                We couldn't find any properties matching your criteria in {location?.name}.
+                Kami tidak dapat menemukan properti yang cocok dengan kriteria Anda di {location?.name}.
               </p>
               <button 
                 onClick={resetFilters}
                 className="btn-primary"
               >
-                Reset Filters
+                Reset Filter
               </button>
             </div>
           )}
