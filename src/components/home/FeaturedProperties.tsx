@@ -155,7 +155,7 @@ const FeaturedProperties: React.FC = () => {
             </p>
           </div>
           <Link
-            to="/jual"
+            to="/listings/jual"
             className="flex items-center text-primary font-medium mt-4 md:mt-0 hover:underline"
           >
             Lihat Semua <ChevronRight size={16} />

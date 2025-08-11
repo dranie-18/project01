@@ -70,7 +70,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
       params.append('maxPrice', priceRange[1].toString());
     }
     
-    navigate(`/${purpose}?${params.toString()}`);
+    navigate(`/listings/${purpose}?${params.toString()}`);
   };
 
   if (variant === 'compact') {

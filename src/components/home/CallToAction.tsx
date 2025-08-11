@@ -15,7 +15,7 @@ const CallToAction: React.FC = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link to="/jual" className="btn-primary py-3 px-6 flex items-center justify-center">
+            <Link to="/listings/jual" className="btn-primary py-3 px-6 flex items-center justify-center">
               <Search size={20} className="mr-2" />
               Cari Properti
             </Link>

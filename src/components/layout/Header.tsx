@@ -47,13 +47,13 @@ const Header: React.FC = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             <Link 
-              to="/jual" 
+              to="/listings/jual" 
               className="text-neutral-700 hover:text-primary transition-colors font-medium"
             >
               Beli
             </Link>
             <Link 
-              to="/sewa" 
+              to="/listings/sewa" 
               className="text-neutral-700 hover:text-primary transition-colors font-medium"
             >
               Sewa
@@ -168,14 +168,14 @@ const Header: React.FC = () => {
           <div className="md:hidden border-t border-neutral-200 py-4">
             <nav className="space-y-2">
               <Link 
-                to="/jual" 
+                to="/listings/jual" 
                 className="block py-2 text-neutral-700 hover:text-primary transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Beli
               </Link>
               <Link 
-                to="/sewa" 
+                to="/listings/sewa" 
                 className="block py-2 text-neutral-700 hover:text-primary transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >

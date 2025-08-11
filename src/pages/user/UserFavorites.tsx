@@ -216,7 +216,7 @@ const UserFavorites: React.FC = () => {
             <p className="text-neutral-600 mb-6">
               Start exploring properties and save the ones you like to see them here.
             </p>
-            <Link to="/jual" className="btn-primary">
+            <Link to="/listings/jual" className="btn-primary">
               Browse Properties
             </Link>
           </div>

@@ -63,6 +63,8 @@ function App() {
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<HomePage />} />
+              <Route path="/listings/:purpose" element={<PropertyListingPage />} />
+              {/* Legacy routes for backward compatibility */}
               <Route path="/jual" element={<PropertyListingPage />} />
               <Route path="/sewa" element={<PropertyListingPage />} />
               <Route path="/lokasi/:locationSlug" element={<LocationDetailPage />} />

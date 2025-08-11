@@ -26,12 +26,20 @@ import { PROPERTY_FEATURES, getAllPropertyFeatures, getFeatureLabelById } from '
 
 const PropertyListingPage: React.FC = () => {
   const location = useLocation();
-  const params = useParams();
+  const { purpose: purposeParam } = useParams<{ purpose?: 'jual' | 'sewa' }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const { showError } = useToast();
   
   // Get filters from URL parameters
-  const purpose = params.purpose || searchParams.get('purpose') || 'jual';
+  const purpose = purposeParam || 
+    (location.pathname.includes('/sewa') ? 'sewa' : 
+     location.pathname.includes('/jual') ? 'jual' : 
+     searchParams.get('purpose') as 'jual' | 'sewa') || 'jual';
+  
+  console.log('PropertyListingPage: Current URL path:', location.pathname);
+  console.log('PropertyListingPage: Purpose from params:', purposeParam);
+  console.log('PropertyListingPage: Final purpose value:', purpose);
+  
   const propertyType = searchParams.get('type');
   const province = searchParams.get('province');
   const city = searchParams.get('city');

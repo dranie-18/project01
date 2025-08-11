@@ -117,7 +117,7 @@ const PropertyTypes: React.FC = () => {
               icon={getIconComponent(category.icon)} 
               title={category.name} 
               count={category.propertyCount} 
-              link={`/jual?type=${category.slug}`} 
+              link={`/listings/jual?type=${category.slug}`} 
             />
           ))}
         </div>

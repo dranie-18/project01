@@ -34,22 +34,22 @@ const Footer: React.FC = () => {
             <h4 className="font-heading font-semibold text-lg mb-4">Properti</h4>
             <ul className="space-y-2 text-neutral-300">
               <li>
-                <Link to="/jual/rumah" className="hover:text-primary transition-colors">Rumah Dijual</Link>
+                <Link to="/listings/jual?type=rumah" className="hover:text-primary transition-colors">Rumah Dijual</Link>
               </li>
               <li>
-                <Link to="/sewa/rumah" className="hover:text-primary transition-colors">Rumah Disewa</Link>
+                <Link to="/listings/sewa?type=rumah" className="hover:text-primary transition-colors">Rumah Disewa</Link>
               </li>
               <li>
-                <Link to="/jual/apartemen" className="hover:text-primary transition-colors">Apartemen Dijual</Link>
+                <Link to="/listings/jual?type=apartemen" className="hover:text-primary transition-colors">Apartemen Dijual</Link>
               </li>
               <li>
-                <Link to="/sewa/apartemen" className="hover:text-primary transition-colors">Apartemen Disewa</Link>
+                <Link to="/listings/sewa?type=apartemen" className="hover:text-primary transition-colors">Apartemen Disewa</Link>
               </li>
               <li>
-                <Link to="/jual/tanah" className="hover:text-primary transition-colors">Tanah Dijual</Link>
+                <Link to="/listings/jual?type=tanah" className="hover:text-primary transition-colors">Tanah Dijual</Link>
               </li>
               <li>
-                <Link to="/jual/ruko" className="hover:text-primary transition-colors">Ruko Dijual</Link>
+                <Link to="/listings/jual?type=ruko" className="hover:text-primary transition-colors">Ruko Dijual</Link>
               </li>
               <li>
                 <Link to="/premium/features" className="hover:text-primary transition-colors">Premium Listings</Link>
