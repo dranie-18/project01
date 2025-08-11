@@ -172,7 +172,7 @@ const Header: React.FC = () => {
                 className="block py-2 text-neutral-700 hover:text-primary transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Beli
+                Jual
               </Link>
               <Link 
                 to="/listings/sewa" 
