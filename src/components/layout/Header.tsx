@@ -50,7 +50,7 @@ const Header: React.FC = () => {
               to="/listings/jual" 
               className="text-neutral-700 hover:text-primary transition-colors font-medium"
             >
-              Beli
+              Jual
             </Link>
             <Link 
               to="/listings/sewa" 
