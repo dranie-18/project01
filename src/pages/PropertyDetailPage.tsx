@@ -32,6 +32,8 @@ import { Helmet } from 'react-helmet-async';
 import { listingService } from '../services/listingService';
 import { useToast } from '../contexts/ToastContext';
 import { getFeatureLabelById } from '../types/listing';
+import { useAuth } from '../contexts/AuthContext';
+import { favoriteService } from '../services/favoriteService';
 
 // Feature icon mapping
 const featureIcons: Record<string, React.ElementType> = {
@@ -81,12 +83,16 @@ const featureIcons: Record<string, React.ElementType> = {
 const PropertyDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { showError } = useToast();
+  const { user, isAuthenticated } = useAuth();
+  const { showSuccess, showInfo } = useToast();
   const [property, setProperty] = useState<Property | null>(null);
   const [activeImage, setActiveImage] = useState<string>('');
   const [isContactFormVisible, setIsContactFormVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [similarProperties, setSimilarProperties] = useState<Property[]>([]);
   const [error, setError] = useState<string | null>(null); // ADD THIS LINE
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
   
   useEffect(() => {
     if (id) {
@@ -97,6 +103,77 @@ const PropertyDetailPage: React.FC = () => {
     window.scrollTo(0, 0);
   }, [id]);
   
+  // Check if property is favorited when component mounts or user changes
+  useEffect(() => {
+    if (isAuthenticated && user && property) {
+      checkFavoriteStatus();
+    }
+  }, [isAuthenticated, user, property]);
+
+  const checkFavoriteStatus = async () => {
+    if (!user || !property) return;
+    
+    try {
+      const favorited = await favoriteService.isFavorited(property.id, user.id);
+      setIsFavorited(favorited);
+    } catch (error) {
+      console.error('Error checking favorite status:', error);
+    }
+  };
+
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isAuthenticated || !user) {
+      showInfo(
+        'Login Required',
+        'Please log in to save properties to your favorites.'
+      );
+      return;
+    }
+
+    if (!property) {
+      showError('Error', 'Property information not available.');
+      return;
+    }
+
+    setIsToggling(true);
+
+    try {
+      const result = await favoriteService.toggleFavorite(property.id, user.id);
+      
+      if (result.success) {
+        setIsFavorited(result.isFavorited);
+        
+        if (result.isFavorited) {
+          showSuccess(
+            'Property Saved',
+            'Property has been added to your favorites.'
+          );
+        } else {
+          showSuccess(
+            'Property Removed',
+            'Property has been removed from your favorites.'
+          );
+        }
+      } else {
+        showError(
+          'Error',
+          'Failed to update favorites. Please try again.'
+        );
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      showError(
+        'Error',
+        'Failed to update favorites. Please try again.'
+      );
+    } finally {
+      setIsToggling(false);
+    }
+  };
+
   const fetchPropertyDetails = async (propertyId: string) => {
     setIsLoading(true);
     setError(null);
@@ -301,6 +378,22 @@ const PropertyDetailPage: React.FC = () => {
               <div className="flex gap-2 ml-auto">
                 <button className="p-2 rounded-full bg-neutral-100 hover:bg-neutral-200 transition-colors" aria-label="Simpan properti">
                   <Heart size={18} />
+                </button>
+                <button 
+                  onClick={handleFavoriteClick}
+                  disabled={isToggling}
+                  className={`p-2 rounded-full transition-colors duration-300 ${
+                    isFavorited 
+                      ? 'bg-red-500 text-white hover:bg-red-600' 
+                      : 'bg-neutral-100 text-neutral-600 hover:bg-primary hover:text-white'
+                  } ${isToggling ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+                >
+                  {isToggling ? (
+                    <Loader size={18} className="animate-spin" />
+                  ) : (
+                    <Heart size={18} className={isFavorited ? 'fill-current' : ''} />
+                  )}
                 </button>
                 <button className="p-2 rounded-full bg-neutral-100 hover:bg-neutral-200 transition-colors" aria-label="Bagikan properti">
                   <Share2 size={18} />
